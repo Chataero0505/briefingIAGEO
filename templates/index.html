@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tu Briefing · IA & Geopolítica</title>
+<meta name="theme-color" content="#0c0d12">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Spline+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0d12; --bg2:#12141c; --card:#161924; --card2:#1b1f2c;
+    --ink:#eef1f8; --muted:#9aa3b8; --faint:#5b6378; --line:#272c3a;
+    --ia:#39d3e6; --ia-dim:#1d4e57; --geo:#f0a13c; --geo-dim:#5a3f18;
+    --shadow:0 18px 40px -22px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Spline Sans",sans-serif; line-height:1.55;
+    padding-bottom:60px;
+    background-image:
+      radial-gradient(900px 500px at 85% -8%, rgba(57,211,230,.07), transparent 60%),
+      radial-gradient(800px 500px at 0% 0%, rgba(240,161,60,.06), transparent 55%);
+    background-attachment:fixed;
+  }
+  body::before{ /* grano sutil */
+    content:""; position:fixed; inset:0; pointer-events:none; opacity:.035; z-index:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 18px;position:relative;z-index:1}
+
+  /* ---------- Cabecera ---------- */
+  header{padding:30px 0 14px}
+  .kicker{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--faint)}
+  h1{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(30px,7vw,46px);
+    line-height:1.02;letter-spacing:-.01em;margin:6px 0 8px}
+  h1 .amp{color:var(--geo)} h1 .ai{color:var(--ia)}
+  .meta{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted)}
+
+  /* ---------- Pestañas ---------- */
+  .tabs{position:sticky;top:0;z-index:5;display:flex;gap:8px;padding:12px 0;
+    background:linear-gradient(var(--bg) 70%,transparent);backdrop-filter:blur(6px)}
+  .tab{flex:1;border:1px solid var(--line);background:var(--card);color:var(--muted);
+    padding:11px 12px;border-radius:13px;font-weight:600;font-size:15px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;transition:.18s}
+  .tab .dot{width:8px;height:8px;border-radius:50%}
+  .tab[data-t=ia] .dot{background:var(--ia)} .tab[data-t=geo] .dot{background:var(--geo)}
+  .tab .n{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--faint)}
+  .tab.on[data-t=ia]{border-color:var(--ia);color:var(--ink);box-shadow:0 0 0 1px var(--ia) inset,0 0 22px -8px var(--ia)}
+  .tab.on[data-t=geo]{border-color:var(--geo);color:var(--ink);box-shadow:0 0 0 1px var(--geo) inset,0 0 22px -8px var(--geo)}
+
+  /* ---------- Barra de herramientas ---------- */
+  .toolbar{display:flex;gap:8px;align-items:center;margin:6px 0 18px;flex-wrap:wrap}
+  .search{flex:1;min-width:160px;display:flex;align-items:center;gap:8px;
+    background:var(--card);border:1px solid var(--line);border-radius:11px;padding:9px 12px}
+  .search input{flex:1;background:none;border:0;color:var(--ink);font:inherit;font-size:14px;outline:none}
+  .search svg{flex:none;opacity:.5}
+  .toggle{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);
+    border-radius:11px;padding:9px 12px;cursor:pointer;font-size:13px;color:var(--muted);user-select:none}
+  .toggle.on{color:var(--ink);border-color:var(--faint)}
+  .toggle .sw{width:30px;height:17px;border-radius:9px;background:#2a3040;position:relative;transition:.2s}
+  .toggle .sw::after{content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#717a90;transition:.2s}
+  .toggle.on .sw{background:var(--ia-dim)} .toggle.on .sw::after{left:15px;background:var(--ia)}
+
+  /* ---------- Tarjetas ---------- */
+  .feed{display:flex;flex-direction:column;gap:14px}
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
+    border-radius:16px;padding:18px 18px 15px;box-shadow:var(--shadow);position:relative;overflow:hidden;
+    animation:rise .4s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
+  .card[data-topic=ia]::before{background:var(--ia)} .card[data-topic=geo]::before{background:var(--geo)}
+  .card.read{opacity:.5}
+  .crow{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+  .imp{display:flex;gap:3px}
+  .imp i{width:6px;height:6px;border-radius:50%;background:#2c3243}
+  .card[data-topic=ia] .imp i.on{background:var(--ia)} .card[data-topic=geo] .imp i.on{background:var(--geo)}
+  .time{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--faint);margin-left:auto}
+  .badge{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    padding:3px 8px;border-radius:6px}
+  .card[data-topic=ia] .badge{color:var(--ia);background:rgba(57,211,230,.1)}
+  .card[data-topic=geo] .badge{color:var(--geo);background:rgba(240,161,60,.12)}
+  .card h2{font-family:"Fraunces",serif;font-weight:600;font-size:21px;line-height:1.18;margin:2px 0 8px;letter-spacing:-.01em}
+  .summary{color:#d3d8e6;font-size:15px}
+  .why{margin-top:10px;font-size:13.5px;color:var(--muted);border-left:2px solid var(--line);padding-left:11px}
+  .why b{color:var(--ink);font-weight:600}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .tag{font-size:11px;color:var(--muted);background:#1f2433;border:1px solid var(--line);padding:3px 9px;border-radius:20px}
+  .srcline{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+  .srclabel{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:7px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#cfd5e4;text-decoration:none;
+    background:#1c2130;border:1px solid var(--line);padding:5px 10px;border-radius:9px;transition:.15s}
+  .chip:hover{border-color:var(--faint);color:#fff;transform:translateY(-1px)}
+  .chip .ic{font-size:11px;opacity:.7}
+  .actions{margin-top:13px;display:flex;justify-content:flex-end}
+  .mark{background:none;border:1px solid var(--line);color:var(--muted);font:inherit;font-size:12.5px;
+    padding:6px 12px;border-radius:9px;cursor:pointer;transition:.15s}
+  .mark:hover{border-color:var(--faint);color:var(--ink)}
+
+  .empty{text-align:center;color:var(--faint);padding:50px 20px;font-size:15px}
+  .empty .big{font-family:"Fraunces",serif;font-size:22px;color:var(--muted);margin-bottom:6px}
+  footer{text-align:center;color:var(--faint);font-family:"JetBrains Mono",monospace;font-size:11px;margin-top:34px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Briefing diario · todo en castellano</div>
+    <h1>Tu <span class="ai">IA</span> <span class="amp">&amp;</span> Geopolítica</h1>
+    <div class="meta" id="meta">cargando…</div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab on" data-t="ia"><span class="dot"></span> IA <span class="n" id="nIa"></span></button>
+    <button class="tab" data-t="geo"><span class="dot"></span> Geopolítica <span class="n" id="nGeo"></span></button>
+  </div>
+
+  <div class="toolbar">
+    <label class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="q" type="search" placeholder="Buscar en el briefing…" autocomplete="off">
+    </label>
+    <div class="toggle" id="hideRead"><span class="sw"></span> Ocultar leídas</div>
+  </div>
+
+  <div class="feed" id="feed"></div>
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const DIGEST = __DIGEST_DATA__;
+
+function lsGet(k,def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch(e){ return def; } }
+function lsSet(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+
+const state = { tab:"ia", q:"", hideRead:false, read: new Set(lsGet("read", [])) };
+
+const $ = s => document.querySelector(s);
+const esc = s => (s||"").replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function relTime(iso){
+  const d = (Date.now() - new Date(iso)) / 1000;
+  if (d < 3600) return "hace " + Math.max(1,Math.round(d/60)) + " min";
+  if (d < 86400) return "hace " + Math.round(d/3600) + " h";
+  return "hace " + Math.round(d/86400) + " d";
+}
+const typeIcon = t => t==="youtube" ? "▶" : t==="newsletter" ? "✉" : "◆";
+
+function saveRead(){ lsSet("read", [...state.read]); }
+
+function visible(){
+  const q = state.q.toLowerCase().trim();
+  return (DIGEST.stories||[]).filter(s=>{
+    if (s.topic !== state.tab) return false;
+    if (state.hideRead && state.read.has(s.id)) return false;
+    if (q){
+      const hay = (s.title+" "+s.summary+" "+(s.tags||[]).join(" ")+" "+
+        (s.sources||[]).map(x=>x.name).join(" ")).toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function render(){
+  const counts = {ia:0, geo:0};
+  (DIGEST.stories||[]).forEach(s=>counts[s.topic]!==undefined && counts[s.topic]++);
+  $("#nIa").textContent = counts.ia;
+  $("#nGeo").textContent = counts.geo;
+
+  const list = visible();
+  const feed = $("#feed");
+  if (!list.length){
+    feed.innerHTML = `<div class="empty"><div class="big">Nada por aquí</div>
+      ${state.q ? "Prueba con otra búsqueda." : "No hay novedades en esta sección por ahora."}</div>`;
+    return;
+  }
+  feed.innerHTML = list.map(s=>{
+    const dots = [1,2,3,4,5].map(n=>`<i class="${n<=s.importance?'on':''}"></i>`).join("");
+    const tags = (s.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join("");
+    const chips = (s.sources||[]).map(x=>
+      `<a class="chip" href="${esc(x.url)}" target="_blank" rel="noopener">
+         <span class="ic">${typeIcon(x.type)}</span>${esc(x.name)}</a>`).join("");
+    const multi = (s.sources||[]).length>1
+      ? `${s.sources.length} fuentes lo cubren` : "Fuente";
+    const isRead = state.read.has(s.id);
+    return `<article class="card ${isRead?'read':''}" data-topic="${s.topic}" data-id="${s.id}">
+      <div class="crow">
+        <span class="badge">${s.topic==='ia'?'Inteligencia Artificial':'Geopolítica'}</span>
+        <div class="imp">${dots}</div>
+        <span class="time">${relTime(s.published)}</span>
+      </div>
+      <h2>${esc(s.title)}</h2>
+      <div class="summary">${esc(s.summary)}</div>
+      ${s.why?`<div class="why"><b>Por qué importa:</b> ${esc(s.why)}</div>`:""}
+      ${tags?`<div class="tags">${tags}</div>`:""}
+      <div class="srcline">
+        <div class="srclabel">${multi}</div>
+        <div class="chips">${chips}</div>
+      </div>
+      <div class="actions">
+        <button class="mark" data-id="${s.id}">${isRead?"Marcar como no leída":"Marcar como leída"}</button>
+      </div>
+    </article>`;
+  }).join("");
+
+  feed.querySelectorAll(".mark").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.id;
+    state.read.has(id)?state.read.delete(id):state.read.add(id);
+    saveRead(); render();
+  });
+}
+
+// Pestañas
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+  t.classList.add("on"); state.tab=t.dataset.t; render();
+});
+$("#q").oninput = e => { state.q = e.target.value; render(); };
+$("#hideRead").onclick = function(){ this.classList.toggle("on"); state.hideRead=this.classList.contains("on"); render(); };
+
+// Cabecera
+(function(){
+  const g = DIGEST.generated_at ? new Date(DIGEST.generated_at) : new Date();
+  const f = g.toLocaleString("es-ES",{day:"2-digit",month:"long",hour:"2-digit",minute:"2-digit"});
+  $("#meta").textContent = `Actualizado ${f} · ${DIGEST.count||0} hechos`;
+  $("#foot").textContent = `Generado automáticamente · ${DIGEST.count||0} hechos tras agrupar duplicados`;
+})();
+
+render();
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>

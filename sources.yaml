@@ -1,0 +1,197 @@
+# =====================================================================
+#  TUS FUENTES
+# ---------------------------------------------------------------------
+#  Este es el ÚNICO archivo que tocas para añadir o quitar fuentes.
+#  Para añadir una nueva: copia una línea parecida y cámbiala.
+#  Para quitar una: borra su línea.
+#
+#  Tipos de fuente:
+#    - youtube : pones el "handle" del canal (lo que empieza por @)
+#    - blog / newsletter : pones la web. Si conoces su RSS exacto,
+#        puedes ponerlo en "feed:" y el programa lo usa directo;
+#        si no, déjalo y el programa intentará encontrarlo solo.
+#
+#  "topic" es solo una PISTA (ia / geo). El programa reclasifica
+#  cada noticia por su cuenta, así que si una fuente de geopolítica
+#  publica algo de IA, igualmente acabará en la pestaña correcta.
+# =====================================================================
+
+sources:
+
+  # ============================ I A ===================================
+
+  # --- YouTube: investigación y papers ---
+  - {name: "Two Minute Papers",            type: youtube, topic: ia, handle: "@TwoMinutePapers"}
+  - {name: "Yannic Kilcher",               type: youtube, topic: ia, handle: "@YannicKilcher"}
+  - {name: "AI Explained",                 type: youtube, topic: ia, handle: "@aiexplained-official"}
+  - {name: "Andrej Karpathy",              type: youtube, topic: ia, handle: "@AndrejKarpathy"}
+  - {name: "3Blue1Brown",                  type: youtube, topic: ia, handle: "@3blue1brown"}
+  - {name: "StatQuest",                    type: youtube, topic: ia, handle: "@statquest"}
+  - {name: "Machine Learning Street Talk", type: youtube, topic: ia, handle: "@MachineLearningStreetTalk"}
+  - {name: "Edan Meyer",                   type: youtube, topic: ia, handle: "@EdanMeyer"}
+
+  # --- YouTube: divulgación / actualidad ---
+  - {name: "Matthew Berman",               type: youtube, topic: ia, handle: "@matthew_berman"}
+  - {name: "Wes Roth",                     type: youtube, topic: ia, handle: "@WesRoth"}
+  - {name: "Matt Wolfe",                   type: youtube, topic: ia, handle: "@mreflow"}
+  - {name: "The AI Daily Brief",           type: youtube, topic: ia, handle: "@AIDailyBrief"}
+  - {name: "bycloud",                      type: youtube, topic: ia, handle: "@bycloudAI"}
+  - {name: "Fireship",                     type: youtube, topic: ia, handle: "@Fireship"}
+  - {name: "ColdFusion",                   type: youtube, topic: ia, handle: "@ColdFusion"}
+  - {name: "ByteByteGo",                   type: youtube, topic: ia, handle: "@ByteByteGo"}
+
+  # --- YouTube: práctico / construir cosas ---
+  - {name: "Sentdex",                      type: youtube, topic: ia, handle: "@sentdex"}
+  - {name: "Krish Naik",                   type: youtube, topic: ia, handle: "@krishnaik06"}
+  - {name: "Nicholas Renotte",             type: youtube, topic: ia, handle: "@NicholasRenotte"}
+  - {name: "Tina Huang",                   type: youtube, topic: ia, handle: "@TinaHuang1"}
+  - {name: "AI Jason",                     type: youtube, topic: ia, handle: "@AIJasonZ"}
+  - {name: "David Ondrej",                 type: youtube, topic: ia, handle: "@DavidOndrej"}
+  - {name: "Cole Medin",                   type: youtube, topic: ia, handle: "@ColeMedin"}
+  - {name: "IndyDevDan",                   type: youtube, topic: ia, handle: "@indydevdan"}
+
+  # --- YouTube: cursos / canales oficiales ---
+  - {name: "DeepLearning.AI",              type: youtube, topic: ia, handle: "@Deeplearningai"}
+  - {name: "Hugging Face",                 type: youtube, topic: ia, handle: "@HuggingFace"}
+  - {name: "Google DeepMind",             type: youtube, topic: ia, handle: "@GoogleDeepMind"}
+  - {name: "freeCodeCamp",                 type: youtube, topic: ia, handle: "@freecodecamp"}
+
+  # --- YouTube: en español ---
+  - {name: "Jon Hernández",                type: youtube, topic: ia, lang: es, handle: "@jonhernandez"}
+  - {name: "Xavier Mitjana",               type: youtube, topic: ia, lang: es, handle: "@XavierMitjana"}
+  - {name: "Nate Gentile",                 type: youtube, topic: ia, lang: es, handle: "@NateGentile7"}
+  - {name: "Dot CSV",                      type: youtube, topic: ia, lang: es, handle: "@DotCSV"}
+  - {name: "DotCSV Lab",                   type: youtube, topic: ia, lang: es, handle: "@DotCSVLab"}
+  - {name: "La Hora Maker",                type: youtube, topic: ia, lang: es, handle: "@LaHoraMaker"}
+  # Carlos Azaustre (dev con IA): descomenta y verifica el handle si lo quieres
+  # - {name: "Carlos Azaustre",            type: youtube, topic: ia, lang: es, handle: "@carlosazaustre"}
+
+  # --- Blogs oficiales de IA ---
+  - {name: "OpenAI",            type: blog, topic: ia, url: "https://openai.com/news/"}
+  - {name: "Anthropic News",    type: blog, topic: ia, url: "https://www.anthropic.com/news"}
+  - {name: "Anthropic Research",type: blog, topic: ia, url: "https://www.anthropic.com/research"}
+  - {name: "Google DeepMind Blog", type: blog, topic: ia, url: "https://deepmind.google/discover/blog/"}
+  - {name: "Hugging Face Blog", type: blog, topic: ia, url: "https://huggingface.co/blog", feed: "https://huggingface.co/blog/feed.xml"}
+  - {name: "Mistral AI",        type: blog, topic: ia, url: "https://mistral.ai/news"}
+  - {name: "Meta AI",           type: blog, topic: ia, url: "https://ai.meta.com/blog/"}
+  - {name: "NVIDIA Dev Blog",   type: blog, topic: ia, url: "https://developer.nvidia.com/blog", feed: "https://developer.nvidia.com/blog/feed"}
+  - {name: "Make Blog",         type: blog, topic: ia, url: "https://www.make.com/en/blog"}
+
+  # --- Newsletters de IA ---
+  - {name: "The Batch (DeepLearning.AI)", type: newsletter, topic: ia, url: "https://www.deeplearning.ai/the-batch/", feed: "https://www.deeplearning.ai/the-batch/rss.xml"}
+  - {name: "TLDR AI",            type: newsletter, topic: ia, url: "https://tldr.tech/ai"}
+  - {name: "Ahead of AI (Raschka)", type: newsletter, topic: ia, url: "https://magazine.sebastianraschka.com", feed: "https://magazine.sebastianraschka.com/feed"}
+  - {name: "Import AI (Jack Clark)", type: newsletter, topic: ia, url: "https://importai.substack.com", feed: "https://importai.substack.com/feed"}
+  - {name: "Interconnects",      type: newsletter, topic: ia, url: "https://www.interconnects.ai", feed: "https://www.interconnects.ai/feed"}
+  - {name: "The Rundown AI",     type: newsletter, topic: ia, url: "https://www.therundown.ai"}
+  - {name: "AI Supremacy",       type: newsletter, topic: ia, url: "https://www.ai-supremacy.com", feed: "https://www.ai-supremacy.com/feed"}
+  - {name: "AI Breakfast",       type: newsletter, topic: ia, url: "https://aibreakfast.beehiiv.com", feed: "https://aibreakfast.beehiiv.com/feed"}
+  - {name: "Ben's Bites",        type: newsletter, topic: ia, url: "https://www.bensbites.com"}
+  - {name: "IA en español",      type: newsletter, topic: ia, lang: es, url: "https://www.iaenespanol.club"}
+  - {name: "Mentes Artificiales",type: newsletter, topic: ia, lang: es, url: "https://www.mentesartificiales.com"}
+
+  # --- Medios especializados de IA ---
+  - {name: "MIT Technology Review", type: blog, topic: ia, url: "https://www.technologyreview.com", feed: "https://www.technologyreview.com/feed/"}
+  - {name: "TechCrunch AI",      type: blog, topic: ia, url: "https://techcrunch.com/category/artificial-intelligence/", feed: "https://techcrunch.com/category/artificial-intelligence/feed/"}
+  - {name: "VentureBeat AI",     type: blog, topic: ia, url: "https://venturebeat.com/category/ai/", feed: "https://venturebeat.com/category/ai/feed/"}
+  - {name: "Xataka IA",          type: blog, topic: ia, lang: es, url: "https://www.xataka.com/categoria/inteligencia-artificial", feed: "https://www.xataka.com/categoria/inteligencia-artificial/rss2.xml"}
+
+  # --- Blogs técnicos / papers ---
+  - {name: "Latent Space",       type: newsletter, topic: ia, url: "https://www.latent.space", feed: "https://www.latent.space/feed"}
+  - {name: "Simon Willison",     type: blog, topic: ia, url: "https://simonwillison.net", feed: "https://simonwillison.net/atom/everything/"}
+  - {name: "Lilian Weng",        type: blog, topic: ia, url: "https://lilianweng.github.io", feed: "https://lilianweng.github.io/index.xml"}
+  - {name: "Hugging Face Papers", type: blog, topic: ia, url: "https://huggingface.co/papers"}
+  - {name: "arXiv cs.AI",        type: blog, topic: ia, url: "https://arxiv.org/list/cs.AI/recent", feed: "https://rss.arxiv.org/rss/cs.AI"}
+
+  # --- IA China ---
+  - {name: "ChinAI (Jeffrey Ding)", type: newsletter, topic: ia, url: "https://chinai.substack.com", feed: "https://chinai.substack.com/feed"}
+  - {name: "ChinaTalk",          type: newsletter, topic: geo, url: "https://www.chinatalk.media", feed: "https://www.chinatalk.media/feed"}
+  - {name: "RadarAI",            type: blog, topic: ia, url: "https://radarai.top/en"}
+  - {name: "SCMP Tech",          type: blog, topic: ia, url: "https://www.scmp.com/tech", feed: "https://www.scmp.com/rss/36/feed"}
+  - {name: "Qwen Blog",          type: blog, topic: ia, url: "https://qwenlm.github.io/blog/", feed: "https://qwenlm.github.io/blog/index.xml"}
+  - {name: "Leiphone AI",        type: blog, topic: ia, url: "https://www.leiphone.com/category/ai"}
+
+  # --- IA industria / empresa ---
+  - {name: "Manufacturing Dive", type: blog, topic: ia, url: "https://www.manufacturingdive.com", feed: "https://www.manufacturingdive.com/feeds/news/"}
+  - {name: "AI Business",        type: blog, topic: ia, url: "https://aibusiness.com", feed: "https://aibusiness.com/rss.xml"}
+  - {name: "McKinsey QuantumBlack", type: blog, topic: ia, url: "https://www.mckinsey.com/capabilities/quantumblack/our-insights"}
+  - {name: "MIT Sloan Management Review", type: blog, topic: ia, url: "https://sloanreview.mit.edu", feed: "https://sloanreview.mit.edu/feed/"}
+
+  # --- Regulación / Europa ---
+  - {name: "EU AI Office",       type: blog, topic: ia, url: "https://digital-strategy.ec.europa.eu/en/policies/ai-office"}
+  - {name: "AI Act Explorer",    type: blog, topic: ia, url: "https://artificialintelligenceact.eu/"}
+  - {name: "Sifted",             type: blog, topic: ia, url: "https://sifted.eu", feed: "https://sifted.eu/feed"}
+
+  # ======================= G E O P O L Í T I C A ======================
+
+  # --- Medios y revistas de referencia ---
+  - {name: "Foreign Affairs",    type: blog, topic: geo, url: "https://www.foreignaffairs.com", feed: "https://www.foreignaffairs.com/rss.xml"}
+  - {name: "Foreign Policy",     type: blog, topic: geo, url: "https://foreignpolicy.com", feed: "https://foreignpolicy.com/feed/"}
+  - {name: "The Economist",      type: blog, topic: geo, url: "https://www.economist.com", feed: "https://www.economist.com/international/rss.xml"}
+  - {name: "Financial Times (World)", type: blog, topic: geo, url: "https://www.ft.com/world", feed: "https://www.ft.com/world?format=rss"}
+  - {name: "Politico Europe",    type: blog, topic: geo, url: "https://www.politico.eu", feed: "https://www.politico.eu/feed/"}
+  - {name: "War on the Rocks",   type: blog, topic: geo, url: "https://warontherocks.com", feed: "https://warontherocks.com/feed/"}
+  - {name: "The Diplomat",       type: blog, topic: geo, url: "https://thediplomat.com", feed: "https://thediplomat.com/feed/"}
+  - {name: "El Orden Mundial",   type: blog, topic: geo, lang: es, url: "https://elordenmundial.com", feed: "https://elordenmundial.com/feed/"}
+
+  # --- Think tanks / análisis ---
+  - {name: "ECFR",               type: blog, topic: geo, url: "https://ecfr.eu", feed: "https://ecfr.eu/feed/"}
+  - {name: "CSIS",               type: blog, topic: geo, url: "https://www.csis.org", feed: "https://www.csis.org/analysis/feed"}
+  - {name: "Carnegie Endowment", type: blog, topic: geo, url: "https://carnegieendowment.org", feed: "https://carnegieendowment.org/rss/solr?maxrow=10"}
+  - {name: "Chatham House",      type: blog, topic: geo, url: "https://www.chathamhouse.org", feed: "https://www.chathamhouse.org/rss/publications"}
+  - {name: "Bruegel",            type: blog, topic: geo, url: "https://www.bruegel.org", feed: "https://www.bruegel.org/rss.xml"}
+  - {name: "International Crisis Group", type: blog, topic: geo, url: "https://www.crisisgroup.org", feed: "https://www.crisisgroup.org/rss.xml"}
+  - {name: "Real Instituto Elcano", type: blog, topic: geo, lang: es, url: "https://www.realinstitutoelcano.org", feed: "https://www.realinstitutoelcano.org/feed/"}
+  - {name: "CIDOB",              type: blog, topic: geo, lang: es, url: "https://www.cidob.org"}
+
+  # --- Newsletters / Substack de geopolítica ---
+  - {name: "Sinification",       type: newsletter, topic: geo, url: "https://www.sinification.com", feed: "https://www.sinification.com/feed"}
+  - {name: "Chartbook (Adam Tooze)", type: newsletter, topic: geo, url: "https://adamtooze.com", feed: "https://adamtooze.com/feed/"}
+  - {name: "Geopolitical Futures", type: newsletter, topic: geo, url: "https://geopoliticalfutures.com", feed: "https://geopoliticalfutures.com/feed/"}
+  - {name: "Noahpinion",         type: newsletter, topic: geo, url: "https://www.noahpinion.blog", feed: "https://www.noahpinion.blog/feed"}
+  - {name: "The Red Line",       type: newsletter, topic: geo, url: "https://www.theredline.substack.com", feed: "https://theredline.substack.com/feed"}
+
+  # --- Inteligencia y datos ---
+  - {name: "Stratfor / RANE Worldview", type: blog, topic: geo, url: "https://worldview.stratfor.com", feed: "https://worldview.stratfor.com/feed"}
+  - {name: "ACLED",              type: blog, topic: geo, url: "https://acleddata.com", feed: "https://acleddata.com/feed/"}
+  - {name: "Rhodium Group",      type: blog, topic: geo, url: "https://rhg.com", feed: "https://rhg.com/feed/"}
+
+  # --- Tech + geopolítica (tu cruce de interés) ---
+  - {name: "Stratechery (Ben Thompson)", type: newsletter, topic: geo, url: "https://stratechery.com", feed: "https://stratechery.com/feed/"}
+  - {name: "CSIS Wadhwani AI Center", type: blog, topic: geo, url: "https://www.csis.org/programs/wadhwani-ai-center"}
+
+  # --- YouTube: geopolítica en inglés ---
+  - {name: "CaspianReport",      type: youtube, topic: geo, handle: "@CaspianReport"}
+  - {name: "PolyMatter",         type: youtube, topic: geo, handle: "@PolyMatter"}
+  - {name: "TLDR News EU",       type: youtube, topic: geo, handle: "@TLDRnewsEU"}
+  - {name: "RealLifeLore",       type: youtube, topic: geo, handle: "@RealLifeLore"}
+  - {name: "The Economist (YT)", type: youtube, topic: geo, handle: "@TheEconomist"}
+  - {name: "CSIS (YT)",          type: youtube, topic: geo, handle: "@csis"}
+  - {name: "Johnny Harris",      type: youtube, topic: geo, handle: "@johnnyharris"}
+  - {name: "Peter Zeihan",       type: youtube, topic: geo, handle: "@ZeihanonGeopolitics"}
+
+  # --- YouTube: geopolítica en español ---
+  - {name: "El Orden Mundial (YT)", type: youtube, topic: geo, lang: es, handle: "@ElOrdenMundial"}
+  - {name: "VisualPolitik",      type: youtube, topic: geo, lang: es, handle: "@VisualPolitikES"}
+  - {name: "Memorias de Pez",    type: youtube, topic: geo, lang: es, handle: "@MemoriasdePez"}
+  - {name: "La ContraCrónica",   type: youtube, topic: geo, lang: es, handle: "@lacontracronica"}
+  - {name: "Juan Ramón Rallo",   type: youtube, topic: geo, lang: es, handle: "@JuanRamonRallo"}
+  - {name: "Solo Fonseca",       type: youtube, topic: geo, lang: es, handle: "@SoloFonseca"}
+
+
+# =====================================================================
+#  AJUSTES (puedes cambiarlos sin saber programar)
+# =====================================================================
+settings:
+  # Cuántas horas hacia atrás miramos en cada actualización.
+  # 28 = un poco más de un día, para no perder nada entre ejecuciones.
+  lookback_hours: 28
+
+  # Modelo de Gemini (gratis). 'gemini-2.5-flash' es el recomendado.
+  model: "gemini-2.5-flash"
+
+  # Máximo de noticias que se procesan por ejecución (protege el límite gratis).
+  max_items_per_run: 200
+
+  # Idioma de salida: todo te llega traducido y resumido aquí.
+  output_language: "español (castellano)"
