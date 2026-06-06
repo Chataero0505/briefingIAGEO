@@ -1,88 +1,63 @@
 """
 fetch.py — Recogida de contenido de todas las fuentes.
 
-- Para YouTube: convierte el @handle en el feed RSS del canal.
-- Para blogs/newsletters: usa el feed indicado o intenta descubrirlo.
-- Devuelve una lista de "items" nuevos (de las últimas N horas),
-  ya sin duplicados exactos (misma URL/ID).
+- YouTube: del feed saca título, DESCRIPCIÓN del vídeo y MINIATURA.
+- Blogs/newsletters: del RSS saca el enlace y baja el ARTÍCULO real (cuerpo + imagen).
+- Memoria de "vistos" con fecha (se purga lo viejo automáticamente).
+- Genera un informe de SALUD por fuente (ok / sin novedades / sin feed / error).
 """
 
 from __future__ import annotations
 import re
 import time
 import datetime as dt
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import requests
 import feedparser
 from bs4 import BeautifulSoup
+import trafilatura
 
 UA = {"User-Agent": "Mozilla/5.0 (compatible; NewsDigestBot/1.0)"}
-TIMEOUT = 20
+TIMEOUT = 15
 
 
 @dataclass
 class Item:
     source_name: str
-    source_type: str          # youtube | blog | newsletter
-    topic_hint: str           # ia | geo
+    source_type: str
+    topic_hint: str
     title: str
     url: str
     published: dt.datetime
-    snippet: str = ""         # resumen/transcripción recortada (contexto para la IA)
+    snippet: str = ""
+    body: str = ""
+    image: str = ""
     lang: str = ""
 
     def key(self) -> str:
-        """Identificador para detectar duplicados exactos."""
         return self.url.split("?")[0].rstrip("/").lower()
 
 
-# ----------------------------------------------------------------------
-#  YouTube: @handle -> channel_id -> feed RSS
-# ----------------------------------------------------------------------
-def resolve_youtube_feed(handle: str, cache: dict) -> str | None:
-    """Convierte un @handle de YouTube en su feed RSS. Cachea el resultado."""
+def resolve_youtube_feed(handle, cache):
     handle = handle.strip()
     if handle in cache:
         return cache[handle]
     try:
-        url = f"https://www.youtube.com/{handle}"
-        html = requests.get(url, headers=UA, timeout=TIMEOUT).text
-        m = re.search(r'"channelId":"(UC[0-9A-Za-z_-]{22})"', html) or \
-            re.search(r'"externalId":"(UC[0-9A-Za-z_-]{22})"', html)
+        html = requests.get(f"https://www.youtube.com/{handle}", headers=UA, timeout=TIMEOUT).text
+        m = (re.search(r'"channelId":"(UC[0-9A-Za-z_-]{22})"', html)
+             or re.search(r'"externalId":"(UC[0-9A-Za-z_-]{22})"', html)
+             or re.search(r'channel_id=(UC[0-9A-Za-z_-]{22})', html))
         if not m:
-            m = re.search(r'channel_id=(UC[0-9A-Za-z_-]{22})', html)
-        if not m:
-            print(f"   [!] No pude resolver el canal de YouTube {handle}")
             return None
         feed = f"https://www.youtube.com/feeds/videos.xml?channel_id={m.group(1)}"
         cache[handle] = feed
         return feed
-    except Exception as e:
-        print(f"   [!] Error resolviendo {handle}: {e}")
+    except Exception:
         return None
 
 
-def fetch_youtube_transcript(video_id: str) -> str:
-    """Intenta sacar la transcripción (es o en). Es opcional: si falla, no pasa nada."""
-    try:
-        from youtube_transcript_api import YouTubeTranscriptApi
-        # Compatible con varias versiones de la librería
-        try:
-            data = YouTubeTranscriptApi().fetch(video_id, languages=["es", "en"])
-            text = " ".join(seg.text for seg in data)
-        except Exception:
-            chunks = YouTubeTranscriptApi.get_transcript(video_id, languages=["es", "en"])
-            text = " ".join(c["text"] for c in chunks)
-        return text[:4000]  # recortamos para no gastar tokens de más
-    except Exception:
-        return ""
-
-
-# ----------------------------------------------------------------------
-#  Blogs / newsletters: descubrir RSS si no se ha indicado
-# ----------------------------------------------------------------------
-def discover_feed(url: str, cache: dict) -> str | None:
+def discover_feed(url, cache):
     if url in cache:
         return cache[url]
     try:
@@ -93,14 +68,12 @@ def discover_feed(url: str, cache: dict) -> str | None:
             feed = requests.compat.urljoin(url, link["href"])
             cache[url] = feed
             return feed
-    except Exception as e:
-        print(f"   [!] No pude descubrir RSS en {url}: {e}")
-    # último intento: patrones habituales
+    except Exception:
+        pass
     for suffix in ("/feed", "/rss", "/feed/", "/index.xml"):
         guess = url.rstrip("/") + suffix
         try:
-            parsed = feedparser.parse(guess)
-            if parsed.entries:
+            if feedparser.parse(guess).entries:
                 cache[url] = guess
                 return guess
         except Exception:
@@ -108,10 +81,27 @@ def discover_feed(url: str, cache: dict) -> str | None:
     return None
 
 
-# ----------------------------------------------------------------------
-#  Parseo de fechas
-# ----------------------------------------------------------------------
-def _entry_datetime(entry) -> dt.datetime:
+def fetch_article(url):
+    try:
+        html = requests.get(url, headers=UA, timeout=TIMEOUT).text
+    except Exception:
+        return "", ""
+    try:
+        body = trafilatura.extract(html, include_comments=False, include_tables=False) or ""
+    except Exception:
+        body = ""
+    image = ""
+    try:
+        soup = BeautifulSoup(html, "html.parser")
+        og = soup.find("meta", attrs={"property": "og:image"}) or soup.find("meta", attrs={"name": "twitter:image"})
+        if og and og.get("content"):
+            image = requests.compat.urljoin(url, og["content"])
+    except Exception:
+        pass
+    return body.strip()[:5000], image
+
+
+def _entry_datetime(entry):
     for attr in ("published_parsed", "updated_parsed"):
         t = getattr(entry, attr, None)
         if t:
@@ -119,83 +109,128 @@ def _entry_datetime(entry) -> dt.datetime:
     return dt.datetime.now(dt.timezone.utc)
 
 
-def _clean(text: str, limit: int = 600) -> str:
+def _clean(text, limit):
     if not text:
         return ""
     return BeautifulSoup(text, "html.parser").get_text(" ", strip=True)[:limit]
 
 
-# ----------------------------------------------------------------------
-#  Recogida principal
-# ----------------------------------------------------------------------
-def collect(sources: list[dict], settings: dict, state: dict) -> list[Item]:
+def _entry_image(entry):
+    for key in ("media_thumbnail", "media_content"):
+        val = entry.get(key)
+        if val and isinstance(val, list) and val[0].get("url"):
+            return val[0]["url"]
+    for enc in entry.get("links", []):
+        if enc.get("type", "").startswith("image") and enc.get("href"):
+            return enc["href"]
+    return ""
+
+
+def _parse_iso(s):
+    try:
+        return dt.datetime.fromisoformat(s)
+    except Exception:
+        return None
+
+
+def collect(sources, settings, state):
+    now = dt.datetime.now(dt.timezone.utc)
+    now_iso = now.isoformat()
     lookback = dt.timedelta(hours=settings.get("lookback_hours", 28))
-    cutoff = dt.datetime.now(dt.timezone.utc) - lookback
-    seen = set(state.get("seen", []))
+    cutoff = now - lookback
+    fetch_bodies = settings.get("fetch_article_bodies", True)
+    retention = dt.timedelta(days=settings.get("seen_retention_days", 60))
+
+    # --- memoria de vistos con fecha (compatible con el formato antiguo de lista) ---
+    raw = state.get("seen", {})
+    if isinstance(raw, list):
+        seen = {k: now_iso for k in raw}
+    else:
+        seen = dict(raw)
+
     yt_cache = state.setdefault("youtube_feeds", {})
     feed_cache = state.setdefault("discovered_feeds", {})
+    health = state.setdefault("source_health", {})
 
-    items: list[Item] = []
+    items, report = [], []
 
     for src in sources:
-        name = src["name"]
-        stype = src["type"]
-        topic = src.get("topic", "ia")
-        lang = src.get("lang", "")
+        name, stype = src["name"], src["type"]
+        topic, lang = src.get("topic", "ia"), src.get("lang", "")
+        status, note, new_count, thin = "ok", "", 0, 0
 
-        # 1) Determinar el feed RSS
         if stype == "youtube":
             feed_url = resolve_youtube_feed(src["handle"], yt_cache)
         else:
             feed_url = src.get("feed") or discover_feed(src["url"], feed_cache)
 
         if not feed_url:
-            continue
+            status = "sin_feed"
+        else:
+            try:
+                parsed = feedparser.parse(feed_url, request_headers=UA)
+                for entry in parsed.entries[:30]:
+                    link = entry.get("link", "")
+                    if not link:
+                        continue
+                    published = _entry_datetime(entry)
+                    if published < cutoff:
+                        continue
+                    k = link.split("?")[0].rstrip("/").lower()
+                    if k in seen:
+                        continue
+                    seen[k] = now_iso
 
-        # 2) Leer el feed
-        try:
-            parsed = feedparser.parse(feed_url, request_headers=UA)
-        except Exception as e:
-            print(f"   [!] Error leyendo {name}: {e}")
-            continue
+                    rss_text = _clean(entry.get("summary", "") or entry.get("description", ""), 5000)
+                    item = Item(source_name=name, source_type=stype, topic_hint=topic,
+                                title=entry.get("title", "(sin título)").strip(),
+                                url=link, published=published, lang=lang,
+                                image=_entry_image(entry))
+                    if stype == "youtube":
+                        item.body = rss_text
+                        item.snippet = rss_text[:220]
+                    else:
+                        body, image = ("", "")
+                        if fetch_bodies:
+                            body, image = fetch_article(link)
+                        item.body = body if len(body) > 200 else rss_text
+                        item.snippet = (rss_text or body)[:220]
+                        if image and not item.image:
+                            item.image = image
+                        if len(item.body) < 300:
+                            thin += 1
+                    items.append(item)
+                    new_count += 1
+            except Exception as e:
+                status = "error"
+                note = str(e)[:120]
 
-        new_count = 0
-        for entry in parsed.entries[:30]:
-            link = entry.get("link", "")
-            if not link:
-                continue
-            published = _entry_datetime(entry)
-            if published < cutoff:
-                continue
+        # --- estado y salud histórica de la fuente ---
+        if status == "ok":
+            status = "ok" if new_count > 0 else "sin_novedades"
+            if new_count > 0:
+                health.setdefault(name, {})["last_success"] = now_iso
+            if thin and thin == new_count and new_count > 0:
+                note = "titulares cortos (¿de pago?)"
+        if status in ("error", "sin_feed"):
+            health.setdefault(name, {})["last_error"] = now_iso
+        h = health.setdefault(name, {})
+        h["last_status"] = status
+        h["last_check"] = now_iso
 
-            item = Item(
-                source_name=name, source_type=stype, topic_hint=topic,
-                title=entry.get("title", "(sin título)").strip(),
-                url=link, published=published, lang=lang,
-                snippet=_clean(entry.get("summary", "") or entry.get("description", "")),
-            )
-            if item.key() in seen:
-                continue
-            seen.add(item.key())
-
-            # 3) YouTube: añadir transcripción como contexto extra
-            if stype == "youtube":
-                vid = entry.get("yt_videoid") or (link.split("v=")[-1].split("&")[0] if "v=" in link else "")
-                if vid:
-                    tr = fetch_youtube_transcript(vid)
-                    if tr:
-                        item.snippet = (item.snippet + " " + tr).strip()[:4000]
-
-            items.append(item)
-            new_count += 1
-
+        report.append({
+            "name": name, "type": stype, "topic": topic, "status": status,
+            "new": new_count, "note": note,
+            "last_success": h.get("last_success", ""), "last_error": h.get("last_error", ""),
+        })
         if new_count:
             print(f"   + {name}: {new_count} nuevos")
-        time.sleep(0.2)  # cortesía con los servidores
+        time.sleep(0.15)
 
-    # Guardamos lo visto (limitado para que el archivo no crezca infinito)
-    state["seen"] = list(seen)[-8000:]
+    # purga de vistos antiguos
+    keep_after = now - retention
+    seen = {k: v for k, v in seen.items() if (_parse_iso(v) or now) >= keep_after}
+    state["seen"] = seen
 
-    # Ordenamos por fecha (lo más nuevo primero) y limitamos volumen
     items.sort(key=lambda i: i.published, reverse=True)
-    return items[: settings.get("max_items_per_run", 200)]
+    return items[: settings.get("max_items_per_run", 200)], report

@@ -1,11 +1,11 @@
 """
 summarize.py — Capa de IA (Gemini, gratis).
 
-Dos pasos:
-  1) AGRUPAR: junta los items que hablan del MISMO hecho (aunque vengan
-     de fuentes distintas). Así una noticia no se repite.
-  2) RESUMIR: por cada grupo, escribe UN resumen en español con título,
-     contexto, "por qué importa", importancia (1-5) y etiquetas.
+  1) AGRUPAR: junta items del MISMO hecho (no se repite nada).
+  2) RESUMIR + PUNTUAR: por cada grupo, resumen en español, importancia general,
+     RELEVANCIA para TUS intereses, si es NOTICIA (filtro de ruido) y si es CRUCE IA-geo.
+  3) RESUMEN DEL DÍA: un texto corto con lo más importante.
+  4) DESTACAR: marca los hechos top por relevancia.
 """
 
 from __future__ import annotations
@@ -22,31 +22,38 @@ from .fetch import Item
 
 _client = None
 
+SUBTEMAS_IA = ["Modelos", "Herramientas/Agentes", "Empresas", "Investigación",
+               "IA China", "Regulación", "Uso profesional/Industria"]
+SUBTEMAS_GEO = ["Europa", "EE. UU.", "China/Asia", "Defensa/Conflictos", "Energía", "Economía"]
+
+DETALLE = {
+    "breve": "1-2 frases, muy al grano.",
+    "normal": "un párrafo de 3-5 frases.",
+    "detallado": "2-3 párrafos. Primer párrafo: qué ha pasado con datos y nombres concretos. "
+                 "Segundo: contexto y antecedentes. Tercero (si aplica): implicaciones y qué "
+                 "vigilar. Separa los párrafos con una línea en blanco.",
+}
+
 
 def _get_client() -> genai.Client:
     global _client
     if _client is None:
-        api_key = os.environ.get("GEMINI_API_KEY")
-        if not api_key:
+        key = os.environ.get("GEMINI_API_KEY")
+        if not key:
             raise RuntimeError("Falta la variable GEMINI_API_KEY (la clave de Gemini).")
-        _client = genai.Client(api_key=api_key)
+        _client = genai.Client(api_key=key)
     return _client
 
 
-def _generate(model: str, prompt: str, retries: int = 4) -> str:
-    """Llama a Gemini pidiendo JSON, con reintentos si hay límite de ritmo (429)."""
+def _generate(model, prompt, as_json=True, retries=4):
     client = _get_client()
+    cfg = types.GenerateContentConfig(
+        response_mime_type="application/json" if as_json else "text/plain",
+        temperature=0.3)
     for attempt in range(retries):
         try:
-            resp = client.models.generate_content(
-                model=model,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    temperature=0.3,
-                ),
-            )
-            return resp.text or ""
+            return _get_client().models.generate_content(
+                model=model, contents=prompt, config=cfg).text or ""
         except Exception as e:
             msg = str(e).lower()
             if ("429" in msg or "resource" in msg or "rate" in msg) and attempt < retries - 1:
@@ -59,7 +66,7 @@ def _generate(model: str, prompt: str, retries: int = 4) -> str:
     return ""
 
 
-def _parse_json(text: str):
+def _parse_json(text):
     if not text:
         return None
     text = text.strip()
@@ -71,9 +78,8 @@ def _parse_json(text: str):
     try:
         return json.loads(text)
     except Exception:
-        # intento de rescate: buscar el primer corchete/llave
-        for open_c, close_c in (("[", "]"), ("{", "}")):
-            i, j = text.find(open_c), text.rfind(close_c)
+        for o, c in (("[", "]"), ("{", "}")):
+            i, j = text.find(o), text.rfind(c)
             if i != -1 and j != -1:
                 try:
                     return json.loads(text[i:j + 1])
@@ -82,122 +88,143 @@ def _parse_json(text: str):
     return None
 
 
-# ----------------------------------------------------------------------
-#  Paso 1: agrupar items del mismo hecho
-# ----------------------------------------------------------------------
-def cluster(items: list[Item], model: str) -> list[dict]:
+def cluster(items, model):
     if not items:
         return []
-
-    listing = []
-    for idx, it in enumerate(items):
-        listing.append(f'{idx}. [{it.topic_hint}] ({it.source_name}) {it.title} :: {it.snippet[:160]}')
-    joined = "\n".join(listing)
-
+    listing = "\n".join(
+        f'{i}. [{it.topic_hint}] ({it.source_name}) {it.title} :: {it.snippet[:160]}'
+        for i, it in enumerate(items))
     prompt = f"""Eres un editor de noticias. Abajo hay una lista numerada de noticias/vídeos
 sobre Inteligencia Artificial y/o Geopolítica, de fuentes distintas y en varios idiomas.
 
-Agrupa las que tratan EXACTAMENTE EL MISMO hecho o anuncio concreto (mismo evento,
-mismo lanzamiento, misma noticia), aunque las cuenten medios diferentes. Sé CONSERVADOR:
-si dudas, déjalas separadas. Cada noticia debe aparecer en un único grupo. Las que no
-se parezcan a ninguna otra forman su propio grupo de un solo elemento.
+Agrupa las que tratan EXACTAMENTE EL MISMO hecho o anuncio concreto, aunque las cuenten
+medios diferentes. Sé CONSERVADOR: si dudas, déjalas separadas. Cada noticia va en un único
+grupo; las que no se parezcan a ninguna forman grupo de un solo elemento.
 
-Para cada grupo asigna un tema: "ia" si es sobre inteligencia artificial, "geo" si es
-sobre geopolítica/relaciones internacionales/economía política. Si encaja en ambos,
-elige el que predomine.
+Asigna tema a cada grupo: "ia" o "geo" (el que predomine).
 
-Devuelve SOLO un JSON con esta forma, sin texto extra:
-[{{"indices": [0, 4], "topic": "ia"}}, {{"indices": [1], "topic": "geo"}}]
+Devuelve SOLO un JSON: [{{"indices":[0,4],"topic":"ia"}}, {{"indices":[1],"topic":"geo"}}]
 
 Lista:
-{joined}
+{listing}
 """
     data = _parse_json(_generate(model, prompt))
     if not isinstance(data, list):
-        # si la IA falla, cada item va por su cuenta
         return [{"indices": [i], "topic": it.topic_hint} for i, it in enumerate(items)]
-
     groups, used = [], set()
     for g in data:
         idxs = [i for i in g.get("indices", []) if isinstance(i, int) and 0 <= i < len(items) and i not in used]
-        if not idxs:
-            continue
-        used.update(idxs)
-        groups.append({"indices": idxs, "topic": g.get("topic", items[idxs[0]].topic_hint)})
-    # cualquier item que la IA se haya dejado fuera, lo añadimos solo
+        if idxs:
+            used.update(idxs)
+            groups.append({"indices": idxs, "topic": g.get("topic", items[idxs[0]].topic_hint)})
     for i, it in enumerate(items):
         if i not in used:
             groups.append({"indices": [i], "topic": it.topic_hint})
     return groups
 
 
-# ----------------------------------------------------------------------
-#  Paso 2: resumir cada grupo en español (en lotes para gastar menos)
-# ----------------------------------------------------------------------
-def summarize_groups(groups: list[dict], items: list[Item], model: str, batch_size: int = 6) -> list[dict]:
-    stories: list[dict] = []
-
+def summarize_groups(groups, items, model, detalle="detallado", intereses="",
+                     output_language="español (castellano)", batch_size=4):
+    instruccion = DETALLE.get(detalle, DETALLE["detallado"])
+    intereses_txt = intereses.strip() or "tecnología, IA y geopolítica en general"
+    lista_ia = ", ".join(SUBTEMAS_IA)
+    lista_geo = ", ".join(SUBTEMAS_GEO)
+    stories = []
     for start in range(0, len(groups), batch_size):
         batch = groups[start:start + batch_size]
         blocks = []
         for n, g in enumerate(batch):
             srcs = [items[i] for i in g["indices"]]
-            txt = "\n".join(f"  - ({s.source_name}) {s.title}: {s.snippet[:300]}" for s in srcs)
+            txt = "\n".join(f"  - ({s.source_name}) {s.title}\n    {(s.body or s.snippet)[:1400]}" for s in srcs)
             blocks.append(f"GRUPO {n} (tema={g['topic']}):\n{txt}")
         joined = "\n\n".join(blocks)
+        prompt = f"""Eres el redactor de un boletín diario en {output_language}
+para un lector con estos INTERESES: {intereses_txt}.
 
-        prompt = f"""Eres un redactor de un boletín diario en ESPAÑOL (castellano de España).
-Abajo hay varios GRUPOS de noticias. Cada grupo es UN solo hecho contado por una o más fuentes.
+Abajo hay GRUPOS de noticias; cada grupo es UN solo hecho contado por una o más fuentes.
 
-Para CADA grupo escribe, SIEMPRE en español aunque las fuentes estén en inglés u otro idioma:
-- "titular": un titular claro y conciso en español.
-- "resumen": 2-4 frases explicando qué ha pasado, sintetizando todas las fuentes del grupo
-  sin repetir datos. Tono neutral e informativo.
-- "por_que_importa": 1 frase sobre por qué es relevante.
-- "importancia": número del 1 (menor) al 5 (gran impacto).
-- "etiquetas": 2-4 etiquetas cortas en español.
+Para CADA grupo devuelve, SIEMPRE en {output_language} aunque las fuentes estén en otro idioma:
+- "titular": titular claro.
+- "resumen": {instruccion} Sintetiza todas las fuentes sin repetir. Neutral, concreto
+  (cifras, nombres, fechas si aparecen). No inventes datos que no estén.
+- "por_que_importa": 1 frase de relevancia.
+- "importancia": 1-5 (impacto general de la noticia).
+- "relevancia": 1-5 (cuánto encaja con los INTERESES de arriba; 5 = totalmente).
+- "es_noticia": true si es un hecho/novedad informativa; false si es contenido promocional,
+  patrocinado, sorteo, clickbait, tutorial genérico o sin valor informativo.
+- "cruce": true si la noticia toca A LA VEZ inteligencia artificial Y geopolítica/economía
+  política (p. ej. chips, soberanía tecnológica, regulación, energía para IA); si no, false.
+- "subtema": si el tema del grupo es "ia", elige uno de [{lista_ia}]; si es "geo", elige uno de
+  [{lista_geo}]; si ninguno encaja bien, pon "Otros".
+- "etiquetas": 2-4 etiquetas cortas.
 
-Devuelve SOLO un JSON (lista), un objeto por grupo y EN EL MISMO ORDEN:
-[{{"titular":"...","resumen":"...","por_que_importa":"...","importancia":3,"etiquetas":["..."]}}]
+Devuelve SOLO un JSON (lista), un objeto por grupo y EN EL MISMO ORDEN.
 
 {joined}
 """
         data = _parse_json(_generate(model, prompt))
         if not isinstance(data, list) or len(data) != len(batch):
-            data = [{} for _ in batch]  # degradado: usamos el título original
-
+            data = [{} for _ in batch]
         for g, res in zip(batch, data):
+            if res.get("es_noticia") is False:
+                continue  # filtro de ruido
             srcs = [items[i] for i in g["indices"]]
             first = srcs[0]
-            published = max(s.published for s in srcs)
-            sid = hashlib.md5(("|".join(sorted(s.key() for s in srcs))).encode()).hexdigest()[:10]
+            image = next((s.image for s in srcs if s.image), "")
+            sid = hashlib.md5("|".join(sorted(s.key() for s in srcs)).encode()).hexdigest()[:10]
+            # Ordena fuentes: primero las primarias (oficial/blog), luego medios, luego vídeo
+            order = {"blog": 0, "newsletter": 1, "youtube": 2}
+            srcs_sorted = sorted(srcs, key=lambda s: order.get(s.source_type, 1))
             stories.append({
                 "id": sid,
                 "topic": g["topic"] if g["topic"] in ("ia", "geo") else first.topic_hint,
+                "subtopic": res.get("subtema") or "Otros",
+                "cruce": bool(res.get("cruce", False)),
                 "title": res.get("titular") or first.title,
-                "summary": res.get("resumen") or first.snippet[:300],
+                "summary": res.get("resumen") or (first.body or first.snippet)[:400],
                 "why": res.get("por_que_importa", ""),
                 "importance": int(res.get("importancia", 2) or 2),
+                "relevance": int(res.get("relevancia", 2) or 2),
                 "tags": res.get("etiquetas", [])[:4],
-                "published": published.isoformat(),
-                "sources": [
-                    {"name": s.source_name, "url": s.url, "type": s.source_type}
-                    for s in srcs
-                ],
+                "image": image,
+                "published": max(s.published for s in srcs).isoformat(),
+                "sources": [{"name": s.source_name, "url": s.url, "type": s.source_type} for s in srcs_sorted],
             })
-        time.sleep(4)  # respeta el ritmo del nivel gratis
-
-    stories.sort(key=lambda s: (s["importance"], s["published"]), reverse=True)
+        time.sleep(4)
+    stories.sort(key=lambda s: (s["relevance"], s["importance"], s["published"]), reverse=True)
     return stories
 
 
-def build_digest(items: list[Item], model: str) -> dict:
+def daily_brief(stories, model, intereses="", output_language="español (castellano)"):
+    if not stories:
+        return ""
+    top = stories[:15]
+    lines = "\n".join(f"- [{s['topic']}] {s['title']}" for s in top)
+    intereses_txt = intereses.strip() or "IA y geopolítica"
+    prompt = f"""Eres el editor de un boletín. Con estos titulares del día, escribe en {output_language}
+un resumen ejecutivo de 3-5 frases ("el día en 60 segundos") para alguien interesado en
+{intereses_txt}. Destaca lo más importante de IA y de geopolítica y, si lo hay, el cruce
+entre ambos. Tono directo, sin saludos ni despedidas. Devuelve solo el texto.
+
+Titulares:
+{lines}
+"""
+    return (_generate(model, prompt, as_json=False) or "").strip()
+
+
+def build_digest(items, model, detalle="detallado", intereses="", output_language="español (castellano)"):
     print(f"   · Agrupando {len(items)} noticias por hecho…")
     groups = cluster(items, model)
-    print(f"   · {len(groups)} hechos únicos tras agrupar. Resumiendo en español…")
-    stories = summarize_groups(groups, items, model)
+    print(f"   · {len(groups)} hechos únicos. Resumiendo y puntuando en español ({detalle})…")
+    stories = summarize_groups(groups, items, model, detalle=detalle,
+                               intereses=intereses, output_language=output_language)
+    print(f"   · {len(stories)} tras filtrar ruido. Escribiendo el resumen del día…")
+    brief = daily_brief(stories, model, intereses=intereses, output_language=output_language)
+    top = [s["id"] for s in stories[:5]]
     return {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "count": len(stories),
+        "daily_brief": brief,
+        "top": top,
         "stories": stories,
     }
