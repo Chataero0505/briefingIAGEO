@@ -1,15 +1,12 @@
 name: Briefing diario
 
-# Cuándo se ejecuta:
 on:
   schedule:
-    # 06:00 UTC = ~08:00 en España (07:00 en horario de invierno).
-    # Para cambiar la hora, edita el número (en hora UTC).
     - cron: "0 6 * * *"
-  workflow_dispatch:        # botón para lanzarlo a mano cuando quieras
+  workflow_dispatch:
 
 permissions:
-  contents: write           # necesario para guardar el resultado en el repo
+  contents: write
 
 concurrency:
   group: briefing
@@ -18,6 +15,9 @@ concurrency:
 jobs:
   generar:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONUNBUFFERED: "1"
     steps:
       - name: Descargar el código
         uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
       - name: Generar el briefing
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python main.py
+        run: python -u main.py
 
       - name: Guardar y publicar el resultado
         run: |
