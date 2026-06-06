@@ -199,5 +199,16 @@ settings:
   # Bajar el cuerpo real de cada artículo para resumir mejor (recomendado: true).
   fetch_article_bodies: true
 
+  # TUS INTERESES: el briefing ordena y destaca según esto. Edítalo a tu gusto.
+  mis_intereses: >
+    IA aplicada a la industria y fabricación (Industry 5.0, cobótica, gemelos digitales);
+    agentes de IA y automatización del trabajo; avances técnicos de modelos relevantes;
+    semiconductores y hardware de IA; regulación de IA y política tecnológica de la UE;
+    competición tecnológica EE. UU.-China; energía y sostenibilidad (incluida la energía
+    para centros de datos); cadena de suministro y resiliencia industrial.
+
+  # Días que se recuerda una noticia ya vista (para no repetirla).
+  seen_retention_days: 60
+
   # Idioma de salida: todo te llega traducido y resumido aquí.
   output_language: "español (castellano)"

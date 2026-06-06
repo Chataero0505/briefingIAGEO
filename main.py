@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
 main.py — Punto de entrada. Hace todo de principio a fin:
-  1) Lee tus fuentes (sources.yaml) y el estado anterior (state/state.json)
-  2) Recoge lo nuevo de cada fuente, sin duplicados exactos
-  3) Agrupa por hecho y resume en español con Gemini
-  4) Genera docs/index.html (lo que abres en el móvil)
+  1) Lee fuentes (sources.yaml) y estado anterior (state/state.json)
+  2) Recoge novedades (sin duplicados) y mide la salud de cada fuente
+  3) Agrupa, puntúa y resume en tu idioma con Gemini
+  4) Genera docs/index.html (el briefing) y docs/estado.html (salud)
   5) Guarda el estado para la próxima vez
 
-Se ejecuta solo en GitHub Actions cada mañana. Tú no tienes que correrlo a mano.
+Si un día no hay novedades, NO borra el briefing anterior.
 """
 
 import json
@@ -18,7 +18,7 @@ import yaml
 
 from aggregator.fetch import collect
 from aggregator.summarize import build_digest
-from aggregator.render import render
+from aggregator.render import render, render_status
 
 ROOT = pathlib.Path(__file__).resolve().parent
 STATE_FILE = ROOT / "state" / "state.json"
@@ -46,24 +46,28 @@ def main() -> None:
     settings = cfg.get("settings", {})
     model = settings.get("model", "gemini-2.5-flash")
     detalle = settings.get("resumen_detalle", "detallado")
-    print(f"Fuentes configuradas: {len(sources)} · modelo: {model} · detalle: {detalle}")
+    idioma = settings.get("output_language", "español (castellano)")
+    intereses = settings.get("mis_intereses", "")
+    if isinstance(intereses, list):
+        intereses = ", ".join(intereses)
+    print(f"Fuentes: {len(sources)} · modelo: {model} · detalle: {detalle}")
 
     state = load_state()
 
-    print("\n[1/3] Recogiendo novedades…")
-    items = collect(sources, settings, state)
+    print("\n[1/3] Recogiendo novedades y midiendo salud de fuentes…")
+    items, report = collect(sources, settings, state)
     print(f"   = {len(items)} noticias nuevas en total.")
 
+    print("\n[2/3] Procesando con Gemini…")
     if items:
-        print("\n[2/3] Agrupando y resumiendo con Gemini…")
-        digest = build_digest(items, model, detalle=detalle)
+        digest = build_digest(items, model, detalle=detalle,
+                              intereses=intereses, output_language=idioma)
+        render(digest)
     else:
-        print("\n[2/3] No hay novedades; mantengo el briefing anterior vacío.")
-        digest = {"generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
-                  "count": 0, "top": [], "stories": []}
+        print("   Sin novedades: mantengo el briefing anterior intacto.")
 
-    print("\n[3/3] Generando la página…")
-    render(digest)
+    print("\n[3/3] Generando página de estado…")
+    render_status(report)
 
     save_state(state)
     print("\nListo. ✅")

@@ -92,6 +92,15 @@ Edita el archivo **`sources.yaml`** (puedes hacerlo desde el móvil):
 En `.github/workflows/daily.yml`, la línea `- cron: "0 6 * * *"` marca las 06:00 UTC
 (~08:00 en España). Cambia el `6` por otra hora **en UTC**.
 
+### Ajustar a tus intereses
+En `sources.yaml`, el campo `mis_intereses:` define qué temas se ordenan y destacan primero.
+Edítalo con tus propias palabras y el briefing se reordenará según lo que más te importe.
+
+### Ver qué fuentes funcionan
+En el pie del briefing tienes el enlace **"Estado de las fuentes"**: una página que muestra
+qué fuentes van bien, cuáles no dan RSS o están de pago y cuándo funcionaron por última vez.
+Útil para limpiar la lista de vez en cuando.
+
 ### Lanzarlo cuando quieras
 Pestaña **Actions** → **Briefing diario** → **Run workflow**.
 
@@ -111,9 +120,10 @@ Pestaña **Actions** → **Briefing diario** → **Run workflow**.
 ## Cómo está montado (por curiosidad)
 - `sources.yaml` — tus fuentes y ajustes (lo único que tocas).
 - `main.py` — orquesta todo el proceso.
-- `aggregator/fetch.py` — recoge RSS, YouTube y transcripciones.
-- `aggregator/summarize.py` — agrupa duplicados y resume en español con Gemini.
-- `aggregator/render.py` — genera la página `docs/index.html`.
+- `aggregator/fetch.py` — recoge RSS, vídeos recientes de YouTube (título, descripción y
+  miniatura) y el cuerpo de los artículos cuando puede extraerlo. Mide la salud de cada fuente.
+- `aggregator/summarize.py` — agrupa duplicados, puntúa relevancia y resume en español con Gemini.
+- `aggregator/render.py` — genera la página `docs/index.html` y la de estado `docs/estado.html`.
 - `templates/index.html` — el diseño del briefing.
 - `.github/workflows/daily.yml` — la automatización diaria.
 - `docs/` — lo que se publica (web + iconos + PWA).
