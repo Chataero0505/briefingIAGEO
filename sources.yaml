@@ -193,5 +193,11 @@ settings:
   # Máximo de noticias que se procesan por ejecución (protege el límite gratis).
   max_items_per_run: 200
 
+  # Nivel de detalle de los resúmenes: "breve" | "normal" | "detallado".
+  resumen_detalle: "detallado"
+
+  # Bajar el cuerpo real de cada artículo para resumir mejor (recomendado: true).
+  fetch_article_bodies: true
+
   # Idioma de salida: todo te llega traducido y resumido aquí.
   output_language: "español (castellano)"

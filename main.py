@@ -45,7 +45,8 @@ def main() -> None:
     sources = cfg.get("sources", [])
     settings = cfg.get("settings", {})
     model = settings.get("model", "gemini-2.5-flash")
-    print(f"Fuentes configuradas: {len(sources)} · modelo: {model}")
+    detalle = settings.get("resumen_detalle", "detallado")
+    print(f"Fuentes configuradas: {len(sources)} · modelo: {model} · detalle: {detalle}")
 
     state = load_state()
 
@@ -55,11 +56,11 @@ def main() -> None:
 
     if items:
         print("\n[2/3] Agrupando y resumiendo con Gemini…")
-        digest = build_digest(items, model)
+        digest = build_digest(items, model, detalle=detalle)
     else:
         print("\n[2/3] No hay novedades; mantengo el briefing anterior vacío.")
         digest = {"generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
-                  "count": 0, "stories": []}
+                  "count": 0, "top": [], "stories": []}
 
     print("\n[3/3] Generando la página…")
     render(digest)
