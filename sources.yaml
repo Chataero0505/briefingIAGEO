@@ -188,7 +188,7 @@ settings:
   lookback_hours: 28
 
   # Modelo de Gemini (gratis). 'gemini-2.5-flash' es el recomendado.
-  model: "gemini-2.5-flash"
+  model: "gemini-2.5-flash-lite"
 
   # Máximo de noticias que se procesan por ejecución (protege el límite gratis).
   max_items_per_run: 200
