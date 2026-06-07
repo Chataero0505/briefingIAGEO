@@ -50,10 +50,11 @@ def _get_client() -> genai.Client:
     return _client
 
 
-def _generate(model, prompt, as_json=True, retries=4):
+def _generate(model, prompt, as_json=True, retries=5):
     client = _get_client()
     cfg = types.GenerateContentConfig(
         response_mime_type="application/json" if as_json else "text/plain",
+        max_output_tokens=8192,
         temperature=0.3)
     for attempt in range(retries):
         try:
@@ -62,15 +63,18 @@ def _generate(model, prompt, as_json=True, retries=4):
         except Exception as e:
             msg = str(e).lower()
             is_429 = "429" in msg or "resource" in msg or "rate" in msg or "quota" in msg
+            is_overload = ("503" in msg or "unavailable" in msg or "overloaded" in msg
+                           or "high demand" in msg)
             # Límite DIARIO agotado: insistir no sirve, se reinicia a medianoche (hora del Pacífico).
             if is_429 and ("perday" in msg or "per day" in msg or "requests per day" in msg
                            or "generaterequestsperday" in msg):
                 print("   [!] Cuota DIARIA de Gemini agotada. Me quedo con lo ya generado.")
                 raise _DailyQuotaExceeded()
-            # Límite por minuto: esperar y reintentar.
-            if is_429 and attempt < retries - 1:
-                wait = 20 * (attempt + 1)
-                print(f"   [i] Límite por minuto, esperando {wait}s…")
+            # Saturación temporal del modelo (503) o límite por minuto: esperar y reintentar.
+            if (is_429 or is_overload) and attempt < retries - 1:
+                wait = 15 * (attempt + 1)
+                motivo = "Modelo saturado" if is_overload else "Límite por minuto"
+                print(f"   [i] {motivo}, reintento en {wait}s…")
                 time.sleep(wait)
                 continue
             print(f"   [!] Error de Gemini: {e}")
@@ -136,7 +140,7 @@ Lista:
 
 
 def summarize_groups(groups, items, model, detalle="detallado", intereses="",
-                     output_language="español (castellano)", batch_size=10):
+                     output_language="español (castellano)", batch_size=6):
     instruccion = DETALLE.get(detalle, DETALLE["detallado"])
     intereses_txt = intereses.strip() or "tecnología, IA y geopolítica en general"
     lista_ia = ", ".join(SUBTEMAS_IA)
@@ -181,9 +185,14 @@ Devuelve SOLO un JSON (lista), un objeto por grupo y EN EL MISMO ORDEN.
         except _DailyQuotaExceeded:
             print(f"   [!] Cuota agotada; me quedo con {len(stories)} hechos ya resumidos.")
             break
-        if not isinstance(data, list) or len(data) != len(batch):
-            data = [{} for _ in batch]
+        # Emparejar por orden lo que devuelva el modelo; si faltan objetos, relleno SOLO
+        # esos (no se pierde el lote entero por un desajuste de longitud).
+        if not isinstance(data, list):
+            data = []
+        data = (list(data) + [{}] * len(batch))[:len(batch)]
         for g, res in zip(batch, data):
+            if not isinstance(res, dict):
+                res = {}
             if res.get("es_noticia") is False:
                 continue  # filtro de ruido
             srcs = [items[i] for i in g["indices"]]
