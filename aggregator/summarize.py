@@ -150,8 +150,10 @@ Para CADA grupo devuelve, SIEMPRE en {output_language} aunque las fuentes estén
 - "por_que_importa": 1 frase de relevancia.
 - "importancia": 1-5 (impacto general de la noticia).
 - "relevancia": 1-5 (cuánto encaja con los INTERESES de arriba; 5 = totalmente).
-- "es_noticia": true si es un hecho/novedad informativa; false si es contenido promocional,
-  patrocinado, sorteo, clickbait, tutorial genérico o sin valor informativo.
+- "es_noticia": true SOLO si es un hecho o novedad informativa real. Pon false si es contenido
+  promocional o patrocinado, sorteos, clickbait, tutoriales genéricos, listas de "mejores
+  herramientas", publicaciones de foro o comunidad, hilos de dudas o preguntas de usuarios,
+  logística de un hackathon o concurso, o cualquier cosa sin valor periodístico.
 - "cruce": true si la noticia toca A LA VEZ inteligencia artificial Y geopolítica/economía
   política (p. ej. chips, soberanía tecnológica, regulación, energía para IA); si no, false.
 - "subtema": si el tema del grupo es "ia", elige uno de [{lista_ia}]; si es "geo", elige uno de
