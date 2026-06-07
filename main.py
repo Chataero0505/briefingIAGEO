@@ -62,7 +62,10 @@ def main() -> None:
     if items:
         digest = build_digest(items, model, detalle=detalle,
                               intereses=intereses, output_language=idioma)
-        render(digest)
+        if digest.get("stories"):
+            render(digest)
+        else:
+            print("   Sin resultados utilizables (¿cuota agotada?): mantengo el briefing anterior.")
     else:
         print("   Sin novedades: mantengo el briefing anterior intacto.")
 
