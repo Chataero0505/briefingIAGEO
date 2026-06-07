@@ -22,6 +22,11 @@ from .fetch import Item
 
 _client = None
 
+
+class _DailyQuotaExceeded(Exception):
+    """Se ha agotado la cuota DIARIA de Gemini: reintentar no sirve de nada."""
+    pass
+
 SUBTEMAS_IA = ["Modelos", "Herramientas/Agentes", "Empresas", "Investigación",
                "IA China", "Regulación", "Uso profesional/Industria"]
 SUBTEMAS_GEO = ["Europa", "EE. UU.", "China/Asia", "Defensa/Conflictos", "Energía", "Economía"]
@@ -56,9 +61,16 @@ def _generate(model, prompt, as_json=True, retries=4):
                 model=model, contents=prompt, config=cfg).text or ""
         except Exception as e:
             msg = str(e).lower()
-            if ("429" in msg or "resource" in msg or "rate" in msg) and attempt < retries - 1:
+            is_429 = "429" in msg or "resource" in msg or "rate" in msg or "quota" in msg
+            # Límite DIARIO agotado: insistir no sirve, se reinicia a medianoche (hora del Pacífico).
+            if is_429 and ("perday" in msg or "per day" in msg or "requests per day" in msg
+                           or "generaterequestsperday" in msg):
+                print("   [!] Cuota DIARIA de Gemini agotada. Me quedo con lo ya generado.")
+                raise _DailyQuotaExceeded()
+            # Límite por minuto: esperar y reintentar.
+            if is_429 and attempt < retries - 1:
                 wait = 20 * (attempt + 1)
-                print(f"   [i] Límite de ritmo, esperando {wait}s…")
+                print(f"   [i] Límite por minuto, esperando {wait}s…")
                 time.sleep(wait)
                 continue
             print(f"   [!] Error de Gemini: {e}")
@@ -124,7 +136,7 @@ Lista:
 
 
 def summarize_groups(groups, items, model, detalle="detallado", intereses="",
-                     output_language="español (castellano)", batch_size=4):
+                     output_language="español (castellano)", batch_size=10):
     instruccion = DETALLE.get(detalle, DETALLE["detallado"])
     intereses_txt = intereses.strip() or "tecnología, IA y geopolítica en general"
     lista_ia = ", ".join(SUBTEMAS_IA)
@@ -164,7 +176,11 @@ Devuelve SOLO un JSON (lista), un objeto por grupo y EN EL MISMO ORDEN.
 
 {joined}
 """
-        data = _parse_json(_generate(model, prompt))
+        try:
+            data = _parse_json(_generate(model, prompt))
+        except _DailyQuotaExceeded:
+            print(f"   [!] Cuota agotada; me quedo con {len(stories)} hechos ya resumidos.")
+            break
         if not isinstance(data, list) or len(data) != len(batch):
             data = [{} for _ in batch]
         for g, res in zip(batch, data):
@@ -211,12 +227,20 @@ entre ambos. Tono directo, sin saludos ni despedidas. Devuelve solo el texto.
 Titulares:
 {lines}
 """
-    return (_generate(model, prompt, as_json=False) or "").strip()
+    try:
+        return (_generate(model, prompt, as_json=False) or "").strip()
+    except _DailyQuotaExceeded:
+        return ""
 
 
 def build_digest(items, model, detalle="detallado", intereses="", output_language="español (castellano)"):
     print(f"   · Agrupando {len(items)} noticias por hecho…")
-    groups = cluster(items, model)
+    try:
+        groups = cluster(items, model)
+    except _DailyQuotaExceeded:
+        print("   [!] Cuota agotada al empezar; hoy no se genera briefing nuevo.")
+        return {"generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+                "count": 0, "daily_brief": "", "top": [], "stories": []}
     print(f"   · {len(groups)} hechos únicos. Resumiendo y puntuando en español ({detalle})…")
     stories = summarize_groups(groups, items, model, detalle=detalle,
                                intereses=intereses, output_language=output_language)
