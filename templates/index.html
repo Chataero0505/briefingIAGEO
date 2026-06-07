@@ -113,6 +113,8 @@
   .empty .big{font-family:"Fraunces",serif;font-size:22px;color:var(--muted);margin-bottom:6px}
   footer{text-align:center;color:var(--faint);font-family:"JetBrains Mono",monospace;font-size:11px;margin-top:34px}
   footer a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--faint)}
+  .statuslink{display:inline-block;margin-top:10px;font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.04em;color:var(--muted);text-decoration:none;background:var(--card);border:1px solid var(--line);padding:6px 12px;border-radius:9px;transition:.15s}
+  .statuslink:hover{color:var(--ink);border-color:var(--faint)}
 </style>
 </head>
 <body>
@@ -121,6 +123,7 @@
     <div class="kicker">Briefing diario · todo en castellano</div>
     <h1>Tu <span class="ai">IA</span> <span class="amp">&amp;</span> Geopolítica</h1>
     <div class="meta" id="meta">cargando…</div>
+    <a class="statuslink" href="estado.html">⚙ Estado de las fuentes</a>
   </header>
 
   <section class="brief" id="brief" style="display:none"></section>
