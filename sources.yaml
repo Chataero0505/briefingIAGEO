@@ -255,7 +255,7 @@ settings:
 
   # Modelo de Gemini (gratis). 'gemini-2.5-flash-lite' da ~1000 peticiones/día
   # (frente a las ~20/día de 'gemini-2.5-flash'). Ideal para el uso diario automático.
-  model: "gemini-2.5-flash-lite"
+  model: "gemini-2.5-flash"
 
   # Máximo de noticias que se procesan por ejecución (protege el límite gratis).
   max_items_per_run: 200
