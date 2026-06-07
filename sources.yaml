@@ -180,6 +180,71 @@ sources:
   - {name: "Solo Fonseca",       type: youtube, topic: geo, lang: es, handle: "@SoloFonseca"}
 
 
+  # ============== FUENTES AÑADIDAS (ampliación curada) ===============
+  # --- IA · semiconductores, hardware y energía de centros de datos ---
+  - {name: "SemiAnalysis",      type: newsletter, topic: ia, url: "https://semianalysis.com", feed: "https://semianalysis.substack.com/feed"}
+  - {name: "Fabricated Knowledge", type: newsletter, topic: ia, url: "https://www.fabricatedknowledge.com", feed: "https://fabricatedknowledge.substack.com/feed"}
+  - {name: "The Chip Letter",   type: newsletter, topic: ia, url: "https://thechipletter.substack.com", feed: "https://thechipletter.substack.com/feed"}
+  - {name: "Semiconductor Engineering", type: blog, topic: ia, url: "https://semiengineering.com", feed: "https://semiengineering.com/feed/"}
+  - {name: "Asianometry",       type: youtube, topic: ia, handle: "@Asianometry"}
+
+  # --- IA · investigación y laboratorios ---
+  - {name: "Microsoft Research", type: blog, topic: ia, url: "https://www.microsoft.com/en-us/research/blog/", feed: "https://www.microsoft.com/en-us/research/feed/"}
+  - {name: "AWS Machine Learning Blog", type: blog, topic: ia, url: "https://aws.amazon.com/blogs/machine-learning/", feed: "https://aws.amazon.com/blogs/machine-learning/feed/"}
+  - {name: "Amazon Science",    type: blog, topic: ia, url: "https://www.amazon.science/blog", feed: "https://www.amazon.science/index.rss"}
+  - {name: "Stanford HAI",      type: blog, topic: ia, url: "https://hai.stanford.edu", feed: "https://hai.stanford.edu/rss.xml"}
+  - {name: "Epoch AI",          type: newsletter, topic: ia, url: "https://epoch.ai", feed: "https://epochai.substack.com/feed"}
+  - {name: "The Gradient",      type: newsletter, topic: ia, url: "https://thegradient.pub", feed: "https://thegradientpub.substack.com/feed"}
+
+  # --- IA · aplicada al trabajo, industria y robótica (Industria 5.0) ---
+  - {name: "One Useful Thing (Mollick)", type: newsletter, topic: ia, url: "https://www.oneusefulthing.org", feed: "https://oneusefulthing.substack.com/feed"}
+  - {name: "Exponential View",  type: newsletter, topic: ia, url: "https://www.exponentialview.co", feed: "https://exponentialview.substack.com/feed"}
+  - {name: "Last Week in AI",   type: newsletter, topic: ia, url: "https://lastweekin.ai", feed: "https://lastweekin.ai/feed"}
+  - {name: "IEEE Spectrum (IA)", type: blog, topic: ia, url: "https://spectrum.ieee.org/topic/artificial-intelligence/", feed: "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss"}
+  - {name: "IEEE Spectrum (Robótica)", type: blog, topic: ia, url: "https://spectrum.ieee.org/topic/robotics/", feed: "https://spectrum.ieee.org/feeds/topic/robotics.rss"}
+  - {name: "IEEE Spectrum (Semiconductores)", type: blog, topic: ia, url: "https://spectrum.ieee.org/topic/semiconductors/", feed: "https://spectrum.ieee.org/feeds/topic/semiconductors.rss"}
+  - {name: "The Robot Report",  type: blog, topic: ia, url: "https://www.therobotreport.com", feed: "https://www.therobotreport.com/feed/"}
+  - {name: "Robotics & Automation News", type: blog, topic: ia, url: "https://roboticsandautomationnews.com", feed: "https://roboticsandautomationnews.com/feed/"}
+  - {name: "Automation World",  type: blog, topic: ia, url: "https://www.automationworld.com", feed: "https://www.automationworld.com/__rss/website-feeds.xml"}
+
+  # --- IA · China ---
+  - {name: "DigiChina (Stanford)", type: blog, topic: ia, url: "https://digichina.stanford.edu", feed: "https://digichina.stanford.edu/feed/"}
+  - {name: "TechNode",          type: blog, topic: ia, url: "https://technode.com", feed: "https://technode.com/feed/"}
+
+  # --- IA / política tecnológica ---
+  - {name: "Tech Policy Press", type: blog, topic: ia, url: "https://www.techpolicy.press", feed: "https://www.techpolicy.press/feed/"}
+  - {name: "CSET (Georgetown)", type: blog, topic: ia, url: "https://cset.georgetown.edu", feed: "https://cset.georgetown.edu/feed/"}
+  - {name: "Agencia SINC",      type: blog, topic: ia, lang: es, url: "https://www.agenciasinc.es", feed: "https://www.agenciasinc.es/rss/all"}
+
+  # --- GEO · think tanks y defensa ---
+  - {name: "RAND",              type: blog, topic: geo, url: "https://www.rand.org", feed: "https://www.rand.org/pubs/commentary.xml"}
+  - {name: "RUSI",              type: blog, topic: geo, url: "https://www.rusi.org", feed: "https://www.rusi.org/rss/latest-commentary.xml"}
+  - {name: "SIPRI",             type: blog, topic: geo, url: "https://www.sipri.org", feed: "https://www.sipri.org/rss/combined.xml"}
+  - {name: "CNAS",              type: blog, topic: geo, url: "https://www.cnas.org", feed: "https://www.cnas.org/publications/rss"}
+  - {name: "Atlantic Council",  type: blog, topic: geo, url: "https://www.atlanticcouncil.org", feed: "https://www.atlanticcouncil.org/feed/"}
+  - {name: "Hudson Institute",  type: blog, topic: geo, url: "https://www.hudson.org", feed: "https://www.hudson.org/feed.xml"}
+  - {name: "MERICS",            type: blog, topic: geo, lang: en, url: "https://merics.org/en", feed: "https://merics.org/en/rss"}
+  - {name: "ASPI The Strategist", type: blog, topic: geo, url: "https://www.aspistrategist.org.au", feed: "https://www.aspistrategist.org.au/feed/"}
+  - {name: "Lawfare",           type: blog, topic: geo, url: "https://www.lawfaremedia.org", feed: "https://www.lawfaremedia.org/feed"}
+  - {name: "Defense One",       type: blog, topic: geo, url: "https://www.defenseone.com", feed: "https://www.defenseone.com/rss/all/"}
+  - {name: "EUISS",             type: blog, topic: geo, url: "https://www.iss.europa.eu", feed: "https://www.iss.europa.eu/rss.xml"}
+
+  # --- GEO · medios y China ---
+  - {name: "Euractiv",          type: blog, topic: geo, url: "https://www.euractiv.com", feed: "https://www.euractiv.com/feed/"}
+  - {name: "Asia Times",        type: blog, topic: geo, url: "https://asiatimes.com", feed: "https://asiatimes.com/feed/"}
+  - {name: "Nikkei Asia",       type: blog, topic: geo, url: "https://asia.nikkei.com", feed: "https://asia.nikkei.com/rss/feed/nar"}
+  - {name: "Sinocism",          type: newsletter, topic: geo, url: "https://sinocism.com", feed: "https://sinocism.com/feed"}
+
+  # --- GEO · en español ---
+  - {name: "Descifrando la Guerra", type: blog, topic: geo, lang: es, url: "https://www.descifrandolaguerra.es", feed: "https://www.descifrandolaguerra.es/feed/"}
+  - {name: "Descifrando la Guerra (YT)", type: youtube, topic: geo, lang: es, handle: "@descifrandolaguerra"}
+  - {name: "IEEE.es (Estudios Estratégicos)", type: blog, topic: geo, lang: es, url: "https://www.ieee.es", feed: "https://www.ieee.es/rss/documentos_ieee.xml"}
+
+  # --- GEO · YouTube ---
+  - {name: "Perun",             type: youtube, topic: geo, handle: "@PerunAU"}
+  - {name: "Lowy Institute",    type: youtube, topic: geo, handle: "@LowyInstitute"}
+
+
 # =====================================================================
 #  AJUSTES (puedes cambiarlos sin saber programar)
 # =====================================================================
