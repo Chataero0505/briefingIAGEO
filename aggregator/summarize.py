@@ -170,10 +170,20 @@ Para CADA grupo devuelve, SIEMPRE en {output_language} aunque las fuentes estén
   promocional o patrocinado, sorteos, clickbait, tutoriales genéricos, listas de "mejores
   herramientas", publicaciones de foro o comunidad, hilos de dudas o preguntas de usuarios,
   logística de un hackathon o concurso, o cualquier cosa sin valor periodístico.
-- "cruce": true si la noticia toca A LA VEZ inteligencia artificial Y geopolítica/economía
-  política (p. ej. chips, soberanía tecnológica, regulación, energía para IA); si no, false.
-- "subtema": si el tema del grupo es "ia", elige uno de [{lista_ia}]; si es "geo", elige uno de
-  [{lista_geo}]; si ninguno encaja bien, pon "Otros".
+- "categoria": clasifica el hecho en EXACTAMENTE una de estas tres, según su TEMA CENTRAL:
+    · "ia"    = el núcleo es la inteligencia artificial en sí: modelos, laboratorios y empresas
+                de IA, investigación, productos y herramientas, una startup de IA y su valoración,
+                un chip nuevo para IA visto como producto, etc.
+    · "geo"   = el núcleo es geopolítica, economía, política, defensa o sociedad SIN que la IA sea
+                protagonista: una divisa que se desploma, una elección, un conflicto, sanciones,
+                energía o comercio no ligados a la IA, etc.
+    · "cruce" = SOLO si la IA es a la vez el asunto Y tiene una dimensión geopolítica o de política
+                económica de PRIMER PLANO: guerra de semiconductores y control de exportación de
+                chips, soberanía tecnológica, IA militar, regulación estatal de la IA con peso
+                geopolítico, energía para centros de datos como cuestión estratégica. NO uses
+                "cruce" solo porque se mencionen ambos de pasada: debe ser el eje de la noticia.
+                Ante la duda, elige "ia" o "geo", nunca "cruce".
+- "subtema": elige el que mejor encaje de [{lista_ia}] o de [{lista_geo}]; si ninguno, "Otros".
 - "etiquetas": 2-4 etiquetas cortas.
 
 Devuelve SOLO un JSON (lista), un objeto por grupo y EN EL MISMO ORDEN.
@@ -197,6 +207,14 @@ Devuelve SOLO un JSON (lista), un objeto por grupo y EN EL MISMO ORDEN.
                 continue  # filtro de ruido
             srcs = [items[i] for i in g["indices"]]
             first = srcs[0]
+            # Categoría tri-estado: ia / geo / cruce (con fallback robusto)
+            cat = res.get("categoria")
+            if cat not in ("ia", "geo", "cruce"):
+                cat = "cruce" if res.get("cruce") else (
+                    g["topic"] if g["topic"] in ("ia", "geo") else first.topic_hint)
+            topic = g["topic"] if g["topic"] in ("ia", "geo") else first.topic_hint
+            if cat in ("ia", "geo"):
+                topic = cat
             image = next((s.image for s in srcs if s.image), "")
             sid = hashlib.md5("|".join(sorted(s.key() for s in srcs)).encode()).hexdigest()[:10]
             # Ordena fuentes: primero las primarias (oficial/blog), luego medios, luego vídeo
@@ -204,9 +222,10 @@ Devuelve SOLO un JSON (lista), un objeto por grupo y EN EL MISMO ORDEN.
             srcs_sorted = sorted(srcs, key=lambda s: order.get(s.source_type, 1))
             stories.append({
                 "id": sid,
-                "topic": g["topic"] if g["topic"] in ("ia", "geo") else first.topic_hint,
+                "category": cat,
+                "topic": topic,
                 "subtopic": res.get("subtema") or "Otros",
-                "cruce": bool(res.get("cruce", False)),
+                "cruce": cat == "cruce",
                 "title": res.get("titular") or first.title,
                 "summary": res.get("resumen") or (first.body or first.snippet)[:400],
                 "why": res.get("por_que_importa", ""),

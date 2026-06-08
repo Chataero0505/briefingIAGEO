@@ -23,7 +23,7 @@ import trafilatura
 
 socket.setdefaulttimeout(20)  # red de seguridad para cualquier conexión perdida
 UA = {"User-Agent": "Mozilla/5.0 (compatible; NewsDigestBot/1.0)"}
-FEED_TIMEOUT = 12
+FEED_TIMEOUT = 15
 ARTICLE_TIMEOUT = 10
 
 
@@ -154,6 +154,7 @@ def collect(sources, settings, state):
     cutoff = now - lookback
     fetch_bodies = settings.get("fetch_article_bodies", True)
     max_bodies = settings.get("max_bodies_per_source", 8)
+    max_per_source = settings.get("max_items_per_source", 8)
     retention = dt.timedelta(days=settings.get("seen_retention_days", 60))
     budget = settings.get("collect_budget_minutes", 18) * 60
     start = time.monotonic()
@@ -207,6 +208,8 @@ def collect(sources, settings, state):
                     k = link.split("?")[0].rstrip("/").lower()
                     if k in seen:
                         continue
+                    if new_count >= max_per_source:
+                        break  # tope por fuente: no acaparar el briefing
                     seen[k] = now_iso
 
                     rss_text = _clean(entry.get("summary", "") or entry.get("description", ""), 5000)
