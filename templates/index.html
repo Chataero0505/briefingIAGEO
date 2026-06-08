@@ -53,9 +53,12 @@
   .tab{flex:1;border:1px solid var(--line);background:var(--card);color:var(--muted);padding:11px 12px;border-radius:13px;font-weight:600;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.18s}
   .tab .dot{width:8px;height:8px;border-radius:50%}
   .tab[data-t=ia] .dot{background:var(--ia)} .tab[data-t=geo] .dot{background:var(--geo)}
+  .tab[data-t=cruce] .dot{background:linear-gradient(135deg,var(--ia),var(--geo))}
   .tab .n{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--faint)}
   .tab.on[data-t=ia]{border-color:var(--ia);color:var(--ink);box-shadow:0 0 0 1px var(--ia) inset,0 0 22px -8px var(--ia)}
   .tab.on[data-t=geo]{border-color:var(--geo);color:var(--ink);box-shadow:0 0 0 1px var(--geo) inset,0 0 22px -8px var(--geo)}
+  .tab.on[data-t=cruce]{border-color:var(--ia);color:var(--ink);box-shadow:0 0 0 1px var(--ia) inset,0 0 22px -8px var(--geo)}
+  .tab[data-t=cruce]{font-size:14px}
 
   .toolbar{display:flex;gap:8px;align-items:center;margin:6px 0 12px;flex-wrap:wrap}
   .search{flex:1;min-width:160px;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:9px 12px}
@@ -131,6 +134,7 @@
 
   <div class="tabs">
     <button class="tab on" data-t="ia"><span class="dot"></span> IA <span class="n" id="nIa"></span></button>
+    <button class="tab" data-t="cruce"><span class="dot"></span> IA × Geo <span class="n" id="nCruce"></span></button>
     <button class="tab" data-t="geo"><span class="dot"></span> Geopolítica <span class="n" id="nGeo"></span></button>
   </div>
 
@@ -166,8 +170,10 @@ const paras=t=>(t||"").split(/\n{2,}|\n/).map(p=>p.trim()).filter(Boolean).map(p
 const imgTag=(src,cls)=>src?`<img class="${cls}" src="${esc(src)}" loading="lazy" onerror="this.remove()">`:"";
 function saveRead(){ lsSet("read",[...state.read]); }
 
-// ¿la historia pertenece a la pestaña actual? (las de cruce salen en ambas)
-function inTab(s){ return s.topic===state.tab || (s.cruce && (state.tab==="ia"||state.tab==="geo")); }
+// categoría efectiva de una historia (con respaldo si faltara el campo)
+const catOf=s=>s.category||(s.cruce?"cruce":s.topic);
+// ¿la historia pertenece a la pestaña actual? Cada hecho está en UNA sola pestaña.
+function inTab(s){ return catOf(s)===state.tab; }
 
 function renderBrief(){
   const b=$("#brief");
@@ -214,9 +220,9 @@ function visible(){
 
 function render(){
   renderBrief(); renderFeatured();
-  let ia=0,geo=0;
-  (DIGEST.stories||[]).forEach(s=>{ if(s.topic==='ia'||s.cruce)ia++; if(s.topic==='geo'||s.cruce)geo++; });
-  $("#nIa").textContent=ia; $("#nGeo").textContent=geo;
+  let ia=0,geo=0,cruce=0;
+  (DIGEST.stories||[]).forEach(s=>{ const c=catOf(s); if(c==='ia')ia++; else if(c==='geo')geo++; else if(c==='cruce')cruce++; });
+  $("#nIa").textContent=ia; $("#nGeo").textContent=geo; const nc=$("#nCruce"); if(nc)nc.textContent=cruce;
 
   const pool=(DIGEST.stories||[]).filter(s=>inTab(s) && !(state.hideRead&&state.read.has(s.id)));
   renderSubfilter(pool);
