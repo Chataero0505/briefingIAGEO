@@ -1,15 +1,13 @@
+
 name: Briefing diario
 
-# Cuándo se ejecuta:
 on:
   schedule:
-    # 05:00 UTC = ~07:00 en España (06:00 en horario de invierno).
-    # Para cambiar la hora, edita el número (en hora UTC).
     - cron: "37 4 * * *"
-  workflow_dispatch:        # botón para lanzarlo a mano cuando quieras
+  workflow_dispatch:
 
 permissions:
-  contents: write           # necesario para guardar el resultado en el repo
+  contents: write
 
 concurrency:
   group: briefing
@@ -18,12 +16,14 @@ concurrency:
 jobs:
   generar:
     runs-on: ubuntu-latest
-    timeout-minutes: 30          # corta solo si algo se cuelga (nunca más 4 horas)
+    timeout-minutes: 30
     env:
-      PYTHONUNBUFFERED: "1"      # muestra el progreso al instante en el log
+      PYTHONUNBUFFERED: "1"
     steps:
       - name: Descargar el código
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Preparar Python
         uses: actions/setup-python@v5
@@ -47,5 +47,14 @@ jobs:
             echo "Sin cambios que guardar."
           else
             git commit -m "Briefing $(date -u +'%Y-%m-%d %H:%M') UTC"
-            git push
+            rama="${GITHUB_REF_NAME:-main}"
+            for intento in 1 2 3 4 5; do
+              git pull --rebase --autostash origin "$rama" || true
+              if git push origin "HEAD:$rama"; then
+                echo "Publicado correctamente (intento $intento)."
+                break
+              fi
+              echo "Guardado rechazado; reintento $intento tras integrar cambios…"
+              sleep 5
+            done
           fi
