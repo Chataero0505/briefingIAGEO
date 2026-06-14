@@ -164,8 +164,12 @@ Para CADA grupo devuelve, SIEMPRE en {output_language} aunque las fuentes estén
 - "resumen": {instruccion} Sintetiza todas las fuentes sin repetir. Neutral, concreto
   (cifras, nombres, fechas si aparecen). No inventes datos que no estén.
 - "por_que_importa": 1 frase de relevancia.
-- "importancia": 1-5 (impacto general de la noticia).
-- "relevancia": 1-5 (cuánto encaja con los INTERESES de arriba; 5 = totalmente).
+- "importancia": 1-5 = impacto GLOBAL y objetivo del hecho, al margen de tus intereses.
+  5 = gran calado (veto o regulación de un gobierno, adquisición o ronda millonaria, hito
+  tecnológico de primer orden, gran movimiento geopolítico o de mercado); 1 = anecdótico.
+- "relevancia": 1-5 = cuánto encaja con los INTERESES de arriba (IA aplicada a la industria e
+  Industria 5.0, semiconductores y hardware de IA, energía para centros de datos, regulación
+  de la IA, competición tecnológica EE.UU.-China, geopolítica tecnológica). 5 = de lleno; 1 = nada.
 - "es_noticia": true SOLO si es un hecho o novedad informativa real. Pon false si es contenido
   promocional o patrocinado, sorteos, clickbait, tutoriales genéricos, listas de "mejores
   herramientas", publicaciones de foro o comunidad, hilos de dudas o preguntas de usuarios,
@@ -237,7 +241,17 @@ Devuelve SOLO un JSON (lista), un objeto por grupo y EN EL MISMO ORDEN.
                 "sources": [{"name": s.source_name, "url": s.url, "type": s.source_type} for s in srcs_sorted],
             })
         time.sleep(4)
-    stories.sort(key=lambda s: (s["relevance"], s["importance"], s["published"]), reverse=True)
+    # Filtro por CALIDAD, sin tope numérico: una noticia entra si es muy importante a nivel
+    # global (aunque no sea del nicho), o muy relevante para el perfil, o decente en ambas.
+    # Lo flojo en las dos cosas se descarta como ruido.
+    def _pasa(s):
+        imp, rel = s["importance"], s["relevance"]
+        return imp >= 4 or rel >= 4 or (imp >= 3 and rel >= 3)
+    antes = len(stories)
+    stories = [s for s in stories if _pasa(s)]
+    print(f"   · {len(stories)} hechos superan el listón de calidad (de {antes}).")
+    # Orden equilibrado: importancia global y relevancia personal pesan igual (50/50).
+    stories.sort(key=lambda s: (s["importance"] + s["relevance"], s["published"]), reverse=True)
     return stories
 
 
