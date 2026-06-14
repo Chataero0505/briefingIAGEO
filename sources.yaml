@@ -25,70 +25,43 @@ sources:
   - {name: "Yannic Kilcher",               type: youtube, topic: ia, handle: "@YannicKilcher"}
   - {name: "AI Explained",                 type: youtube, topic: ia, handle: "@aiexplained-official"}
   - {name: "Andrej Karpathy",              type: youtube, topic: ia, handle: "@AndrejKarpathy"}
-  - {name: "3Blue1Brown",                  type: youtube, topic: ia, handle: "@3blue1brown"}
-  - {name: "StatQuest",                    type: youtube, topic: ia, handle: "@statquest"}
-  - {name: "Machine Learning Street Talk", type: youtube, topic: ia, handle: "@MachineLearningStreetTalk"}
-  - {name: "Edan Meyer",                   type: youtube, topic: ia, handle: "@EdanMeyer"}
 
   # --- YouTube: divulgación / actualidad ---
   - {name: "Matthew Berman",               type: youtube, topic: ia, handle: "@matthew_berman"}
   - {name: "Wes Roth",                     type: youtube, topic: ia, handle: "@WesRoth"}
   - {name: "Matt Wolfe",                   type: youtube, topic: ia, handle: "@mreflow"}
-  - {name: "The AI Daily Brief",           type: youtube, topic: ia, handle: "@AIDailyBrief"}
+  - {name: "AI Daily Brief",   type: newsletter, topic: ia, url: "https://aidailybrief.ai", feed: "https://aidailybrief.beehiiv.com/feed"}
   - {name: "bycloud",                      type: youtube, topic: ia, handle: "@bycloudAI"}
-  - {name: "Fireship",                     type: youtube, topic: ia, handle: "@Fireship"}
   - {name: "ColdFusion",                   type: youtube, topic: ia, handle: "@ColdFusion"}
-  - {name: "ByteByteGo",                   type: youtube, topic: ia, handle: "@ByteByteGo"}
 
   # --- YouTube: práctico / construir cosas ---
-  - {name: "Sentdex",                      type: youtube, topic: ia, handle: "@sentdex"}
-  - {name: "Krish Naik",                   type: youtube, topic: ia, handle: "@krishnaik06"}
-  - {name: "Nicholas Renotte",             type: youtube, topic: ia, handle: "@NicholasRenotte"}
-  - {name: "Tina Huang",                   type: youtube, topic: ia, handle: "@TinaHuang1"}
-  - {name: "AI Jason",                     type: youtube, topic: ia, handle: "@AIJasonZ"}
-  - {name: "David Ondrej",                 type: youtube, topic: ia, handle: "@DavidOndrej"}
-  - {name: "Cole Medin",                   type: youtube, topic: ia, handle: "@ColeMedin"}
-  - {name: "IndyDevDan",                   type: youtube, topic: ia, handle: "@indydevdan"}
 
   # --- YouTube: cursos / canales oficiales ---
   - {name: "DeepLearning.AI",              type: youtube, topic: ia, handle: "@Deeplearningai"}
   - {name: "Hugging Face",                 type: youtube, topic: ia, handle: "@HuggingFace"}
   - {name: "Google DeepMind",             type: youtube, topic: ia, handle: "@GoogleDeepMind"}
-  - {name: "freeCodeCamp",                 type: youtube, topic: ia, handle: "@freecodecamp"}
 
   # --- YouTube: en español ---
-  - {name: "Jon Hernández",                type: youtube, topic: ia, lang: es, handle: "@jonhernandez"}
   - {name: "Xavier Mitjana",               type: youtube, topic: ia, lang: es, handle: "@XavierMitjana"}
   - {name: "Nate Gentile",                 type: youtube, topic: ia, lang: es, handle: "@NateGentile7"}
   - {name: "Dot CSV",                      type: youtube, topic: ia, lang: es, handle: "@DotCSV"}
   - {name: "DotCSV Lab",                   type: youtube, topic: ia, lang: es, handle: "@DotCSVLab"}
-  - {name: "La Hora Maker",                type: youtube, topic: ia, lang: es, handle: "@LaHoraMaker"}
   # Carlos Azaustre (dev con IA): descomenta y verifica el handle si lo quieres
   # - {name: "Carlos Azaustre",            type: youtube, topic: ia, lang: es, handle: "@carlosazaustre"}
 
   # --- Blogs oficiales de IA ---
   - {name: "OpenAI",            type: blog, topic: ia, url: "https://openai.com/news/", feed: "https://openai.com/news/rss.xml"}
-  - {name: "Anthropic News",    type: blog, topic: ia, url: "https://www.anthropic.com/news"}
-  - {name: "Anthropic Research",type: blog, topic: ia, url: "https://www.anthropic.com/research"}
+  - {name: "Anthropic News",   type: blog, topic: ia, url: "https://www.anthropic.com/news", feed: "https://openrss.org/www.anthropic.com/news"}
   - {name: "Google AI Blog (DeepMind)", type: blog, topic: ia, url: "https://blog.google/technology/ai/", feed: "https://blog.google/technology/ai/rss/"}
   - {name: "Hugging Face Blog", type: blog, topic: ia, url: "https://huggingface.co/blog", feed: "https://huggingface.co/blog/feed.xml"}
-  - {name: "Mistral AI",        type: blog, topic: ia, url: "https://mistral.ai/news"}
-  - {name: "Meta AI",           type: blog, topic: ia, url: "https://ai.meta.com/blog/"}
   - {name: "NVIDIA Dev Blog",   type: blog, topic: ia, url: "https://developer.nvidia.com/blog", feed: "https://developer.nvidia.com/blog/feed"}
-  - {name: "Make Blog",         type: blog, topic: ia, url: "https://www.make.com/en/blog"}
 
   # --- Newsletters de IA ---
   - {name: "The Batch (DeepLearning.AI)", type: newsletter, topic: ia, url: "https://www.deeplearning.ai/the-batch/", feed: "https://www.deeplearning.ai/the-batch/rss.xml"}
-  - {name: "TLDR AI",            type: newsletter, topic: ia, url: "https://tldr.tech/ai"}
   - {name: "Ahead of AI (Raschka)", type: newsletter, topic: ia, url: "https://magazine.sebastianraschka.com", feed: "https://magazine.sebastianraschka.com/feed"}
   - {name: "Import AI (Jack Clark)", type: newsletter, topic: ia, url: "https://importai.substack.com", feed: "https://importai.substack.com/feed"}
   - {name: "Interconnects",      type: newsletter, topic: ia, url: "https://www.interconnects.ai", feed: "https://www.interconnects.ai/feed"}
-  - {name: "The Rundown AI",     type: newsletter, topic: ia, url: "https://www.therundown.ai"}
-  - {name: "AI Supremacy",       type: newsletter, topic: ia, url: "https://www.ai-supremacy.com", feed: "https://www.ai-supremacy.com/feed"}
-  - {name: "AI Breakfast",       type: newsletter, topic: ia, url: "https://aibreakfast.beehiiv.com", feed: "https://aibreakfast.beehiiv.com/feed"}
   - {name: "Ben's Bites",        type: newsletter, topic: ia, url: "https://www.bensbites.com"}
-  - {name: "IA en español",      type: newsletter, topic: ia, lang: es, url: "https://www.iaenespanol.club"}
-  - {name: "Mentes Artificiales",type: newsletter, topic: ia, lang: es, url: "https://www.mentesartificiales.com"}
 
   # --- Medios especializados de IA ---
   - {name: "MIT Technology Review", type: blog, topic: ia, url: "https://www.technologyreview.com", feed: "https://www.technologyreview.com/topic/artificial-intelligence/feed/"}
@@ -100,8 +73,6 @@ sources:
   - {name: "Latent Space",       type: newsletter, topic: ia, url: "https://www.latent.space", feed: "https://www.latent.space/feed"}
   - {name: "Simon Willison",     type: blog, topic: ia, url: "https://simonwillison.net", feed: "https://simonwillison.net/atom/everything/"}
   - {name: "Lilian Weng",        type: blog, topic: ia, url: "https://lilianweng.github.io", feed: "https://lilianweng.github.io/index.xml"}
-  - {name: "Hugging Face Papers", type: blog, topic: ia, url: "https://huggingface.co/papers"}
-  - {name: "arXiv cs.AI",        type: blog, topic: ia, url: "https://arxiv.org/list/cs.AI/recent", feed: "https://rss.arxiv.org/rss/cs.AI"}
 
   # --- IA China ---
   - {name: "ChinAI (Jeffrey Ding)", type: newsletter, topic: ia, url: "https://chinai.substack.com", feed: "https://chinai.substack.com/feed"}
@@ -110,16 +81,13 @@ sources:
   - {name: "The Verge (IA)",    type: blog, topic: ia, url: "https://www.theverge.com/ai-artificial-intelligence", feed: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"}
   - {name: "SCMP Tech",          type: blog, topic: ia, url: "https://www.scmp.com/tech", feed: "https://www.scmp.com/rss/36/feed"}
   - {name: "Qwen Blog",          type: blog, topic: ia, url: "https://qwenlm.github.io/blog/", feed: "https://qwenlm.github.io/blog/index.xml"}
-  - {name: "Leiphone AI",        type: blog, topic: ia, url: "https://www.leiphone.com/category/ai"}
 
   # --- IA industria / empresa ---
   - {name: "Manufacturing Dive", type: blog, topic: ia, url: "https://www.manufacturingdive.com", feed: "https://www.manufacturingdive.com/feeds/news/"}
   - {name: "AI Business",        type: blog, topic: ia, url: "https://aibusiness.com", feed: "https://aibusiness.com/rss.xml"}
-  - {name: "McKinsey QuantumBlack", type: blog, topic: ia, url: "https://www.mckinsey.com/capabilities/quantumblack/our-insights"}
   - {name: "MIT Sloan Management Review", type: blog, topic: ia, url: "https://sloanreview.mit.edu", feed: "https://sloanreview.mit.edu/feed/"}
 
   # --- Regulación / Europa ---
-  - {name: "EU AI Office",       type: blog, topic: ia, url: "https://digital-strategy.ec.europa.eu/en/policies/ai-office"}
   - {name: "AI Act Explorer",    type: blog, topic: ia, url: "https://artificialintelligenceact.eu/"}
   - {name: "Sifted",             type: blog, topic: ia, url: "https://sifted.eu", feed: "https://sifted.eu/feed"}
 
@@ -143,7 +111,6 @@ sources:
   - {name: "Bruegel",            type: blog, topic: geo, url: "https://www.bruegel.org", feed: "https://www.bruegel.org/rss.xml"}
   - {name: "International Crisis Group", type: blog, topic: geo, url: "https://www.crisisgroup.org", feed: "https://www.crisisgroup.org/rss.xml"}
   - {name: "Real Instituto Elcano", type: blog, topic: geo, lang: es, url: "https://www.realinstitutoelcano.org", feed: "https://www.realinstitutoelcano.org/feed/"}
-  - {name: "CIDOB",              type: blog, topic: geo, lang: es, url: "https://www.cidob.org"}
 
   # --- Newsletters / Substack de geopolítica ---
   - {name: "Sinification",       type: newsletter, topic: geo, url: "https://www.sinification.com", feed: "https://www.sinification.com/feed"}
@@ -159,7 +126,6 @@ sources:
 
   # --- Tech + geopolítica (tu cruce de interés) ---
   - {name: "Stratechery (Ben Thompson)", type: newsletter, topic: geo, url: "https://stratechery.com", feed: "https://stratechery.com/feed/"}
-  - {name: "CSIS Wadhwani AI Center", type: blog, topic: geo, url: "https://www.csis.org/programs/wadhwani-ai-center"}
 
   # --- YouTube: geopolítica en inglés ---
   - {name: "CaspianReport",      type: youtube, topic: geo, handle: "@CaspianReport"}
@@ -173,10 +139,10 @@ sources:
 
   # --- YouTube: geopolítica en español ---
   - {name: "El Orden Mundial (YT)", type: youtube, topic: geo, lang: es, handle: "@ElOrdenMundial"}
-  - {name: "VisualPolitik",      type: youtube, topic: geo, lang: es, handle: "@VisualPolitikES"}
+  - {name: "VisualPolitik",      type: youtube, topic: geo, lang: es, handle: "@VisualPolitikES", channel_id: "UCJQQVLyM6wtPleV4wFBK06g"}
   - {name: "Memorias de Pez",    type: youtube, topic: geo, lang: es, handle: "@MemoriasdePez"}
   - {name: "La ContraCrónica",   type: youtube, topic: geo, lang: es, handle: "@lacontracronica"}
-  - {name: "Juan Ramón Rallo",   type: youtube, topic: geo, lang: es, handle: "@JuanRamonRallo"}
+  - {name: "Juan Ramón Rallo",   type: youtube, topic: geo, lang: es, handle: "@JuanRamonRallo", channel_id: "UCBLCvUUCiSqBCEc-TqZ9rGw"}
   - {name: "Solo Fonseca",       type: youtube, topic: geo, lang: es, handle: "@SoloFonseca"}
 
 
@@ -199,7 +165,6 @@ sources:
   # --- IA · aplicada al trabajo, industria y robótica (Industria 5.0) ---
   - {name: "One Useful Thing (Mollick)", type: newsletter, topic: ia, url: "https://www.oneusefulthing.org", feed: "https://oneusefulthing.substack.com/feed"}
   - {name: "Exponential View",  type: newsletter, topic: ia, url: "https://www.exponentialview.co", feed: "https://exponentialview.substack.com/feed"}
-  - {name: "Last Week in AI",   type: newsletter, topic: ia, url: "https://lastweekin.ai", feed: "https://lastweekin.ai/feed"}
   - {name: "IEEE Spectrum (IA)", type: blog, topic: ia, url: "https://spectrum.ieee.org/topic/artificial-intelligence/", feed: "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss"}
   - {name: "IEEE Spectrum (Robótica)", type: blog, topic: ia, url: "https://spectrum.ieee.org/topic/robotics/", feed: "https://spectrum.ieee.org/feeds/topic/robotics.rss"}
   - {name: "IEEE Spectrum (Semiconductores)", type: blog, topic: ia, url: "https://spectrum.ieee.org/topic/semiconductors/", feed: "https://spectrum.ieee.org/feeds/topic/semiconductors.rss"}
@@ -237,7 +202,7 @@ sources:
 
   # --- GEO · en español ---
   - {name: "Descifrando la Guerra", type: blog, topic: geo, lang: es, url: "https://www.descifrandolaguerra.es", feed: "https://www.descifrandolaguerra.es/feed/"}
-  - {name: "Descifrando la Guerra (YT)", type: youtube, topic: geo, lang: es, handle: "@descifrandolaguerra"}
+  - {name: "Descifrando la Guerra (YT)", type: youtube, topic: geo, lang: es, handle: "@descifrandolaguerra", channel_id: "UCvLrMnloIn_RqITF4Ly5ZEA"}
   - {name: "IEEE.es (Estudios Estratégicos)", type: blog, topic: geo, lang: es, url: "https://www.ieee.es", feed: "https://www.ieee.es/rss/documentos_ieee.xml"}
 
   # --- GEO · YouTube ---

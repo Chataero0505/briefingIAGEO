@@ -185,7 +185,11 @@ def collect(sources, settings, state):
         print(f"   [{i}/{total}] {name}…", flush=True)
 
         if stype == "youtube":
-            feed_url = resolve_youtube_feed(src["handle"], yt_cache)
+            cid = src.get("channel_id")
+            if cid:
+                feed_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={cid}"
+            else:
+                feed_url = resolve_youtube_feed(src["handle"], yt_cache)
         else:
             feed_url = src.get("feed") or discover_feed(src["url"], feed_cache)
 
