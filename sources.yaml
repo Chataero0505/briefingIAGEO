@@ -79,6 +79,7 @@ sources:
   - {name: "ChinaTalk",          type: newsletter, topic: geo, url: "https://www.chinatalk.media", feed: "https://www.chinatalk.media/feed"}
   - {name: "MarkTechPost",      type: blog, topic: ia, url: "https://www.marktechpost.com", feed: "https://www.marktechpost.com/feed/"}
   - {name: "The Verge (IA)",    type: blog, topic: ia, url: "https://www.theverge.com/ai-artificial-intelligence", feed: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"}
+  - {name: "WSJ Tecnología",   type: blog, topic: ia,  url: "https://www.wsj.com/tech", feed: "https://feeds.a.dj.com/rss/RSSWSJD.xml"}
   - {name: "SCMP Tech",          type: blog, topic: ia, url: "https://www.scmp.com/tech", feed: "https://www.scmp.com/rss/36/feed"}
   - {name: "Qwen Blog",          type: blog, topic: ia, url: "https://qwenlm.github.io/blog/", feed: "https://qwenlm.github.io/blog/index.xml"}
 
@@ -97,6 +98,7 @@ sources:
   - {name: "Foreign Affairs",    type: blog, topic: geo, url: "https://www.foreignaffairs.com", feed: "https://www.foreignaffairs.com/rss.xml"}
   - {name: "The Economist",      type: blog, topic: geo, url: "https://www.economist.com", feed: "https://www.economist.com/international/rss.xml"}
   - {name: "Financial Times (World)", type: blog, topic: geo, url: "https://www.ft.com/world", feed: "https://www.ft.com/world?format=rss"}
+  - {name: "WSJ Mundo",        type: blog, topic: geo, url: "https://www.wsj.com/world", feed: "https://feeds.a.dj.com/rss/RSSWorldNews.xml"}
   - {name: "Politico Europe",    type: blog, topic: geo, url: "https://www.politico.eu", feed: "https://www.politico.eu/feed/"}
   - {name: "War on the Rocks",   type: blog, topic: geo, url: "https://warontherocks.com", feed: "https://warontherocks.com/feed/"}
   - {name: "The Diplomat",       type: blog, topic: geo, url: "https://thediplomat.com", feed: "https://thediplomat.com/feed/"}
